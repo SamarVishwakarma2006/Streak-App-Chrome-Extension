@@ -1,0 +1,31 @@
+{
+  "name": "streak-maintaining-extension",
+  "description": "A Chrome extension for daily learning habits.",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "wxt -b chrome",
+    "build": "wxt build -b chrome",
+    "zip": "wxt zip -b chrome",
+    "typecheck": "tsc --noEmit",
+    "test:smoke": "node scripts/smoke.mjs",
+    "postinstall": "wxt prepare"
+  },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@wxt-dev/module-react": "1.2.2",
+    "playwright": "1.62.1",
+    "typescript": "7.0.2",
+    "wxt": "0.21.4"
+  }
+}

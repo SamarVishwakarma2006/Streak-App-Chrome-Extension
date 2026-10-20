@@ -42,6 +42,45 @@ Suggested documentation commit: `docs: establish product specification and build
 
 ---
 
+## 2026-10-20 — Step 02: Chrome extension scaffold
+
+**Status:** Implemented and checked. Not committed or pushed by the assistant.
+
+### Changes
+
+- Preserved the existing Git repository and its GitHub remote.
+- Added WXT, React, TypeScript, strict compiler settings, and exact dependency versions with package-lock.json.
+- Added a Manifest V3 background worker, React popup, and a dashboard opened from the popup.
+- Added temporary PNG icons with editable SVG source and minimal shared styling.
+- Added .gitignore and a credential-free .env.example.
+- Documented local installation, development, build, packaging, and browser checking in README.md.
+- Added a repeatable Playwright smoke script using an isolated Chromium profile.
+
+### Checks
+
+- `npm run typecheck` passed.
+- `npm run build` passed; `npm run zip` rebuilt successfully and produced the extension ZIP.
+- `npm run test:smoke` passed in headless Chrome for Testing 151 via Playwright.
+- Checked MV3 manifest, all packaged icons, absence of requested permissions, background worker startup, popup rendering, keyboard navigation to dashboard, dashboard reload, narrow-layout overflow, and absence of page errors.
+- Visually inspected the popup and dashboard screenshots.
+- The browser check loads the popup as an extension page; toolbar pinning and the native popup container remain manual installation checks.
+
+### Decisions and limitations
+
+- No website access or storage permissions are requested until the corresponding feature is implemented.
+- Goal management, tracking, authentication, and rewards remain future checkpoints.
+- Supabase is not configured and no user activity is collected.
+- Validation browser files, profiles, screenshots, generated output, and dependencies stay outside Git through ignore rules.
+- Temporary icon PNGs were generated from public/icon/source.svg. They are committed assets; regeneration is not required to build.
+
+### Next
+
+Step 03: design foundation and Today interface.
+
+Suggested commit: `chore: scaffold Chrome extension with WXT and React`
+
+---
+
 ## Entry template
 
 Copy this template above this section when recording the next update:

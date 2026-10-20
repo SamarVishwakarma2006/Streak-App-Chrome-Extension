@@ -19,7 +19,7 @@ You control GitHub publishing. These documents do not record a successful push u
 
 - [x] 00 — Product and architecture documents
 - [x] 01 — Build sequence and development log
-- [ ] 02 — Repository housekeeping and extension scaffold
+- [x] 02 — Repository housekeeping and extension scaffold
 - [ ] 03 — Design foundation and Today interface
 - [ ] 04 — Multiple goals and persistent local storage
 - [ ] 05 — Continue buttons and saved activity locations
@@ -68,6 +68,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Keep secrets, dependencies, build output, and local environment files out of Git.
 - Check: build/type-check succeeds; load the unpacked extension and open its popup/dashboard.
 - Suggested commit: `chore: scaffold Chrome extension with WXT and React`
+- Status: implemented and checked on 2026-10-20. TypeScript, production build, ZIP packaging, and isolated Chromium extension smoke check passed. Commit/push not recorded.
 
 ## 03 — Design foundation and Today interface
 
