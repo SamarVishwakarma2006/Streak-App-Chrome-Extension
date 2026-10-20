@@ -144,3 +144,15 @@ Step NN: next concrete outcome.
 
 Suggested commit: `type: concise description`
 ```
+
+## Step 04 — Multiple goals and persistent local storage — 2026-10-20
+
+- Added create/edit/archive/restore/delete flows with native forms and a confirmation dialog for permanent deletion.
+- Added schema 1 in chrome.storage.local, validated background-worker mutations, serialized writes, and live popup/dashboard refresh. Unknown or damaged schemas block writes without clearing saved data. Step 03 had no stored data to migrate.
+- Today now defaults to saved goals; the sample design is opt-in and separate. Goals explicitly remain Not connected; there is no activity completion or reward claim.
+- Added only the storage permission. No new dependencies or website permissions.
+- Checks passed: TypeScript, production build/ZIP, browser creation of three goals, edits and popup synchronization, archive/restore, cancelled and confirmed deletion, invalid worker input, browser close/relaunch with unchanged stored data, unknown-schema write rejection, navigation, demo states, reduced motion, narrow layouts, and no page errors. Visually inspected the 360px layout.
+- Local data can still be lost through uninstalling, clearing extension/profile data, or losing the profile. Device owners can modify local data; no local record is trusted as verified XP.
+- Suggested commit: `feat: add persistent goal management`
+- Commit/push: left to the user; not performed or verified.
+- Next: Step 05 — Continue buttons and saved activity locations.

@@ -2,7 +2,7 @@
 
 A planned Chrome extension for daily learning goals, automatic activity tracking on supported websites, saved Continue links, milestone points, and optional reminders.
 
-**Current stage:** Step 03 — Today design preview with shared goal cards, dashboard navigation, and sample/empty/loading states. All goals and progress are demo data. Goal creation, activity tracking, accounts, and rewards are not implemented yet. The extension is not published.
+**Current stage:** Step 04 — Create, edit, archive, restore, and delete multiple locally saved goals. Popup and dashboard stay synchronized. Automatic tracking, accounts, and rewards are not implemented yet. The extension is not published.
 
 ## Project documents
 
@@ -36,7 +36,7 @@ If PowerShell blocks npm.ps1, use `npm.cmd` in place of `npm`.
 4. Choose this project's `.output/chrome-mv3` folder, which contains manifest.json.
 5. Pin **Streak Maintaining App** from Chrome's extension menu.
 6. Click its icon, then **Open dashboard**.
-7. Explore the sidebar, use **Preview state** to switch between sample/empty/loading views, and select **Continue** on a sample goal to open the demo explanation.
+7. Select **New goal**, enter a name and daily target, and save. Try Edit, Archive, Show archived, Restore, and Delete. Close and reopen Chrome to confirm your goals remain. **Explore design demo** opens the separate sample UI.
 
 After a source change, build again and use **Reload** on the extension card. Reload any open extension pages too.
 
@@ -64,7 +64,7 @@ The check creates dedicated profiles and screenshots in ignored `test-results/`.
 
 ## Configuration and permissions
 
-The scaffold needs no `.env` file, account, website access, or special Chrome permissions. `.env.example` documents the current setup. Never place server secrets in extension configuration: bundled values are visible to users.
+The extension uses only the `storage` permission to save goals. It needs no `.env` file, account, or website access. Local data survives browser restarts and normal extension updates, but uninstalling or clearing extension/profile data can remove it. `.env.example` documents the current setup. Never place server secrets in extension configuration: bundled values are visible to users.
 
 Generated folders, test profiles, credentials, and runtime logs are excluded from Git. Commit `package-lock.json` so other checkouts install the same dependency versions. Temporary PNG icons and their SVG source are committed under `public/icon`.
 
@@ -76,6 +76,6 @@ Browser tracking can discourage casual skipping but cannot guarantee that activi
 
 Follow BUILD_PLAN.md one checkpoint at a time. Update DEVLOG.md with each completed checkpoint, review the diff, then commit and push the intended files. GitHub pushes and Chrome Web Store publication are separate operations.
 
-The next implementation checkpoint is **04 — Multiple goals and persistent local storage**.
+The next implementation checkpoint is **05 — Continue buttons and saved activity locations**.
 
 Repository visibility and license are still undecided. No license is granted by this planning document.

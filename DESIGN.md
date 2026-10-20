@@ -40,3 +40,7 @@ Use semantic headings, landmarks, labeled inputs, visible focus, and a skip link
 All numbers, courses, history, and milestones in this checkpoint are examples. No providers are connected. Continue opens a demo explanation. Nothing is stored or awarded. The dashboard's Preview state selector exposes sample, empty, and loading states for review.
 
 The first real goal-management implementation must distinguish demo content from user records and must never silently import sample activity or XP.
+
+## Saved goals (Step 04)
+
+Today defaults to real, locally saved goal definitions with New goal, Edit, Archive, Restore, and confirmed Delete actions. Forms use native inputs and dialogs. Cards show the daily target and Not connected status without fabricated progress or XP. The popup lists active goals in a bounded scrolling area. The previous sample dashboard is available through Explore design demo and remains separate from saved data.

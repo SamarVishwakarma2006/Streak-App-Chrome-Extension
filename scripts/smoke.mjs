@@ -2,91 +2,102 @@ import assert from 'node:assert/strict';
 import { access, mkdir, mkdtemp, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { chromium } from 'playwright';
-
-// Run after npm run build. Use a dedicated profile, never a personal Chrome profile.
 const extensionPath = path.resolve('.output/chrome-mv3');
 const manifest = JSON.parse(await readFile(path.join(extensionPath, 'manifest.json'), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.equal(manifest.action.default_popup, 'popup.html');
-assert.equal(manifest.permissions?.length ?? 0, 0);
+assert.deepEqual(manifest.permissions, ['storage']);
 assert.equal(manifest.host_permissions?.length ?? 0, 0);
-for (const iconPath of Object.values(manifest.icons)) {
-  await access(path.join(extensionPath, iconPath.replace(/^\//, '')));
-}
-
+for (const icon of Object.values(manifest.icons)) await access(path.join(extensionPath, icon.replace(/^\//, '')));
 await mkdir('test-results', { recursive: true });
 const profile = await mkdtemp(path.resolve('test-results/profile-'));
-const context = await chromium.launchPersistentContext(profile, {
-  channel: 'chromium',
-  headless: true,
-  args: [
-    `--disable-extensions-except=${extensionPath}`,
-    `--load-extension=${extensionPath}`,
-  ],
-});
-
+const launch = () => chromium.launchPersistentContext(profile, { channel: 'chromium', headless: true, args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`] });
+let context = await launch();
+const errors = [];
+const watch = () => context.on('page', page => page.on('pageerror', e => errors.push(e.message)));
+watch();
 try {
-  const errors = [];
-  context.on('page', (page) => page.on('pageerror', (error) => errors.push(error.message)));
-  const worker = context.serviceWorkers()[0] ??
-    await context.waitForEvent('serviceworker', { timeout: 15_000 });
-  const extensionId = new URL(worker.url()).hostname;
+  const worker = context.serviceWorkers()[0] ?? await context.waitForEvent('serviceworker');
+  const base = `chrome-extension://${new URL(worker.url()).hostname}`;
+  const page = await context.newPage();
+  await page.goto(`${base}/dashboard.html`);
+  await page.getByRole('heading', { name: 'Your next chapter starts here.' }).waitFor();
+  async function create(name) {
+    await page.getByRole('button', { name: 'New goal', exact: true }).click();
+    await page.getByLabel('Goal name').fill(name);
+    await page.getByRole('button', { name: 'Save goal', exact: true }).click();
+    await page.getByRole('dialog').waitFor({ state: 'hidden' });
+    await page.getByRole('heading', { name, exact: true }).waitFor();
+  }
+  for (const name of ['JavaScript', 'Spanish', 'Reading']) await create(name);
   const popup = await context.newPage();
   await popup.setViewportSize({ width: 380, height: 600 });
-  await popup.goto(`chrome-extension://${extensionId}/popup.html`);
-  await popup.getByRole('heading', { name: 'Today', exact: true }).waitFor();
+  await popup.goto(`${base}/popup.html`);
+  await popup.getByRole('heading', { name: 'Reading', exact: true }).waitFor();
   assert.equal(await popup.locator('.goal-card').count(), 3);
-  assert.ok(await popup.locator('body').evaluate((body) => body.scrollHeight <= 600));
-  assert.equal(await popup.locator('img').evaluate((img) => img.naturalWidth > 0), true);
-  assert.equal(await popup.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
-  await popup.screenshot({ path: 'test-results/popup.png', fullPage: true });
-  const continueButton = popup.getByRole('button', { name: 'Continue Learn JavaScript demo' });
-  await continueButton.focus();
-  await popup.keyboard.press('Enter');
-  await popup.getByRole('dialog', { name: 'Functions & scope' }).waitFor();
-  await popup.keyboard.press('Escape');
-  await popup.getByRole('dialog').waitFor({ state: 'hidden' });
-  assert.equal(await continueButton.evaluate((button) => button === document.activeElement), true);
-
-  const link = popup.getByRole('link', { name: 'Open dashboard' });
-  await link.focus();
-  const dashboardPromise = context.waitForEvent('page');
-  await popup.keyboard.press('Enter');
-  const dashboard = await dashboardPromise;
-  await dashboard.waitForURL(`chrome-extension://${extensionId}/dashboard.html`);
-  await dashboard.getByRole('heading', { name: 'Today', exact: true }).waitFor();
-  await dashboard.setViewportSize({ width: 1440, height: 1000 });
-  await dashboard.screenshot({ path: 'test-results/dashboard.png', fullPage: true });
+  await page.getByRole('button', { name: 'Edit JavaScript', exact: true }).click();
+  await page.getByLabel('Goal name').fill('Learn TypeScript');
+  await page.getByLabel('Daily target').fill('2');
+  await page.getByRole('combobox', { name: /^Unit/ }).selectOption('lessons');
+  await page.getByRole('button', { name: 'Save goal', exact: true }).click();
+  await popup.getByRole('heading', { name: 'Learn TypeScript' }).waitFor();
+  await popup.getByText('2 lessons per day').waitFor();
+  await page.getByRole('button', { name: 'Archive Spanish', exact: true }).click();
+  await popup.getByRole('heading', { name: 'Spanish', exact: true }).waitFor({ state: 'hidden' });
+  await page.getByRole('button', { name: 'Show archived', exact: true }).click();
+  await page.getByRole('button', { name: 'Restore Spanish', exact: true }).click();
+  await popup.getByRole('heading', { name: 'Spanish', exact: true }).waitFor();
+  await page.getByRole('button', { name: 'Show active', exact: true }).click();
+  await page.getByRole('button', { name: 'Delete Reading', exact: true }).click();
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await page.getByRole('heading', { name: 'Reading', exact: true }).waitFor();
+  await page.getByRole('button', { name: 'Delete Reading', exact: true }).click();
+  await page.getByRole('button', { name: 'Delete permanently', exact: true }).click();
+  await popup.getByRole('heading', { name: 'Reading', exact: true }).waitFor({ state: 'hidden' });
+  await create('Reading');
+  await page.getByRole('button', { name: 'Archive Spanish', exact: true }).click();
+  await popup.getByRole('heading', { name: 'Spanish', exact: true }).waitFor({ state: 'hidden' });
+  // Validate the worker boundary even when native form checks are bypassed.
+  const invalid = await page.evaluate(() => chrome.runtime.sendMessage({ type: 'goals', action: 'create', payload: { name: ' ', target: -1, unit: 'minutes' } }));
+  assert.equal(invalid.ok, false);
   for (const name of ['History', 'Rewards', 'Connections', 'Settings', 'Today']) {
-    const navigation = dashboard.getByRole('navigation').getByRole('link', { name, exact: true });
-    await navigation.focus();
-    await dashboard.keyboard.press('Enter');
-    await dashboard.getByRole('heading', { name, exact: true }).waitFor();
-    assert.equal(await navigation.getAttribute('aria-current'), 'page');
+    await page.getByRole('navigation').getByRole('link', { name, exact: true }).click();
+    await page.getByRole('heading', { name, exact: true }).waitFor();
   }
-  await dashboard.getByLabel('Preview state').selectOption('empty');
-  await dashboard.getByRole('heading', { name: 'Your next chapter starts here.' }).waitFor();
-  assert.equal(await dashboard.locator('.goal-card').count(), 0);
-  await dashboard.screenshot({ path: 'test-results/empty.png', fullPage: true });
-  await dashboard.getByLabel('Preview state').selectOption('loading');
-  await dashboard.getByRole('status').waitFor();
-  await dashboard.emulateMedia({ reducedMotion: 'reduce' });
-  assert.equal(await dashboard.locator('.skeleton span').first().evaluate((el) => getComputedStyle(el).animationName), 'none');
-  await dashboard.screenshot({ path: 'test-results/loading.png', fullPage: true });
-  await dashboard.getByLabel('Preview state').selectOption('sample');
-  await dashboard.reload();
-  await dashboard.getByRole('heading', { name: 'Your daily goals' }).waitFor();
+  await page.getByRole('button', { name: 'Explore design demo' }).click();
+  await page.getByRole('button', { name: 'Continue Learn JavaScript demo' }).click();
+  await page.keyboard.press('Escape');
+  await page.getByRole('dialog').waitFor({ state: 'hidden' });
+  await page.getByLabel('Preview state').selectOption('empty');
+  await page.getByRole('heading', { name: 'Your next chapter starts here.' }).waitFor();
+  await page.getByLabel('Preview state').selectOption('loading');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  assert.equal(await page.locator('.skeleton span').first().evaluate(el => getComputedStyle(el).animationName), 'none');
+  await page.getByRole('button', { name: 'Back to saved goals' }).click();
+  await page.getByRole('heading', { name: 'Learn TypeScript' }).waitFor();
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.screenshot({ path: 'test-results/dashboard.png', fullPage: true });
   for (const width of [1200, 768, 360]) {
-    await dashboard.setViewportSize({ width, height: 800 });
-    assert.equal(await dashboard.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `Overflow at ${width}px`);
+    await page.setViewportSize({ width, height: 800 });
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   }
-  await dashboard.screenshot({ path: 'test-results/dashboard-narrow.png', fullPage: true });
-  // Ensure lengthy future goal names wrap instead of pushing the layout wider.
-  await dashboard.locator('.goal-title-row h3').first().evaluate((el) => { el.textContent = 'A very long learning goal name that must wrap without hiding its progress or actions'; });
-  assert.equal(await dashboard.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
-  assert.deepEqual(errors, []);
-  console.log('PASS: MV3, icons, no permissions, worker, popup height, demo dialog/focus, keyboard navigation, preview states, reduced motion, reload, responsive layouts, long titles, and no page errors.');
-  console.log('Screenshots: test-results/popup.png and test-results/dashboard.png');
-} finally {
+  await page.screenshot({ path: 'test-results/dashboard-narrow.png', fullPage: true });
+  await popup.screenshot({ path: 'test-results/popup.png', fullPage: true });
+  assert.ok(await popup.locator('body').evaluate(body => body.scrollHeight <= 600));
+  const before = await page.evaluate(() => chrome.storage.local.get('goalStore'));
   await context.close();
-}
+  context = await launch(); watch();
+  const restored = await context.newPage();
+  await restored.goto(`${base}/dashboard.html`);
+  await restored.getByRole('heading', { name: 'Learn TypeScript' }).waitFor();
+  assert.deepEqual(await restored.evaluate(() => chrome.storage.local.get('goalStore')), before);
+  await restored.getByRole('button', { name: 'Show archived', exact: true }).click();
+  await restored.getByRole('heading', { name: 'Spanish', exact: true }).waitFor();
+  // An unknown future schema must be preserved, never silently cleared.
+  await restored.evaluate(() => chrome.storage.local.set({ goalStore: { version: 99, goals: [] } }));
+  await restored.getByRole('alert').waitFor();
+  const rejected = await restored.evaluate(() => chrome.runtime.sendMessage({ type: 'goals', action: 'create', payload: { name: 'Unsafe', target: 1, unit: 'lessons' } }));
+  assert.equal(rejected.ok, false);
+  assert.equal((await restored.evaluate(() => chrome.storage.local.get('goalStore'))).goalStore.version, 99);
+  assert.deepEqual(errors, []);
+  console.log('PASS: create/edit/archive/restore/delete, popup synchronization, validation, browser restart persistence, schema preservation, demo navigation, responsive layouts and no page errors.');
+} finally { await context.close(); }

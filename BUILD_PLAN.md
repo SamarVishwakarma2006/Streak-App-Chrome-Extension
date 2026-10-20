@@ -21,7 +21,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - [x] 01 — Build sequence and development log
 - [x] 02 — Repository housekeeping and extension scaffold
 - [x] 03 — Design foundation and Today interface
-- [ ] 04 — Multiple goals and persistent local storage
+- [x] 04 — Multiple goals and persistent local storage
 - [ ] 05 — Continue buttons and saved activity locations
 - [ ] 06 — Local streak rules and prototype rewards
 - [ ] 07 — First integration discovery
@@ -90,6 +90,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Preserve data during extension updates through explicit migrations.
 - Check: create three goals, edit/archive them, restart Chrome, and confirm restoration.
 - Suggested commit: `feat: add persistent goal management`
+- Status: implemented and checked on 2026-10-20. TypeScript, production ZIP, goal lifecycle, popup synchronization, browser restart persistence, invalid-input rejection, unknown-schema preservation, and responsive browser checks passed. Commit/push not recorded.
 
 ## 05 — Continue buttons and saved activity locations
 

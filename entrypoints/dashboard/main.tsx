@@ -2,6 +2,7 @@ import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Brand, DaySummary, GoalList, PreviewControl } from '../../src/components/Today';
 import type { PreviewState } from '../../src/demo';
+import { SavedGoals } from '../../src/components/SavedGoals';
 import '../../src/styles/base.css';
 
 const sections = [
@@ -25,6 +26,7 @@ const upcoming = {
 function Dashboard() {
   const [section, setSection] = useState<Section>(currentSection);
   const [preview, setPreview] = useState<PreviewState>('sample');
+  const [demo, setDemo] = useState(false);
   useEffect(() => {
     const update = () => setSection(currentSection());
     window.addEventListener('hashchange', update);
@@ -43,20 +45,20 @@ function Dashboard() {
           {section === item.id && <span className="nav-dot" aria-hidden="true" />}
         </a>)}</nav>
       <div className="sidebar-bottom"><span className="seed" aria-hidden="true">↗</span>
-        <p>Small steps.<br /><strong>Lasting habits.</strong></p><span className="version">Design preview · v0.1.0</span>
+        <p>Small steps.<br /><strong>Lasting habits.</strong></p><span className="version">Local goals · v0.1.0</span>
       </div>
     </aside>
     <div className="workspace">
-      <header className="topbar"><span>Your learning space</span><span className="demo-badge">DEMO PREVIEW</span></header>
+      <header className="topbar"><span>Your learning space</span><span className="demo-badge">LOCAL PREVIEW</span></header>
       <main id="main-content" className="dashboard" tabIndex={-1}>
         <div className="page-heading">
           <div><p className="eyebrow">BUILD A LITTLE MOMENTUM</p><h1>{sections.find((item) => item.id === section)?.label}</h1>
             <p>{section === 'today' ? 'A good day starts with one small step.' : 'A place for every part of your progress.'}</p></div>
-          {section === 'today' && <PreviewControl value={preview} onChange={setPreview} />}
+          {section === 'today' && <button className="button button-outline" onClick={() => setDemo(!demo)}>{demo ? 'Back to saved goals' : 'Explore design demo'}</button>}
         </div>
-        <div className="preview-notice"><span className="notice-dot" aria-hidden="true" /><p>You’re exploring sample data. No websites are connected and no activity is tracked.</p></div>
-        {section === 'today' ? <div className="today-layout">
-          <div className="today-main">
+        <div className="preview-notice"><span className="notice-dot" aria-hidden="true" /><p>{demo && section === 'today' ? 'You’re exploring sample data. No activity is tracked.' : 'Your goals stay on this device. No websites are connected and tracking is not active yet.'}</p></div>
+        {section === 'today' ? !demo ? <SavedGoals /> : <div className="today-layout">
+          <div className="today-main"><PreviewControl value={preview} onChange={setPreview} />
             {preview === 'sample' && <DaySummary />}
             <div className="section-heading"><h2>Your daily goals</h2><span>{preview === 'sample' ? '3 sample goals' : 'Preview'}</span></div>
             <GoalList state={preview} />
@@ -80,7 +82,7 @@ function Dashboard() {
           <h2>{upcoming[section].title}</h2><p>{upcoming[section].text}</p>
           <a className="button button-outline" href="#today">Back to Today <span aria-hidden="true">→</span></a>
         </section>}
-        <footer className="dashboard-footer"><span>Built for progress, one day at a time.</span><span>Design preview · Sample data</span></footer>
+        <footer className="dashboard-footer"><span>Built for progress, one day at a time.</span><span>Local storage · No cloud sync</span></footer>
       </main>
     </div>
   </div>;

@@ -183,3 +183,18 @@ progress::-moz-progress-bar { background: #64865c; border-radius: 8px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Persistent goal management */
+input { font: inherit; min-width: 0; width: 100%; border: 1px solid #cbd5c6; border-radius: 7px; padding: 9px; color: var(--ink); background: white; }
+input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.goal-dialog label { display: grid; gap: 6px; margin: 14px 0; font-size: 13px; }
+.goal-dialog > .button { margin-top: 12px; }
+.goal-dialog { width: 430px; }
+.goal-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.goal-toolbar { flex-wrap: wrap; }
+.goal-toolbar p { font-size: 12px; }
+button:disabled { opacity: .6; cursor: wait; }
+.popup-goals { max-height: 390px; overflow-y: auto; padding: 4px; }
+.saved-goals.compact .goal-card { grid-template-columns: 30px minmax(0, 1fr); }
+.saved-goals .evidence { font-size: 11px; }
+.saved-goals .goal-actions { max-width: 260px; }
