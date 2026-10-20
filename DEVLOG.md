@@ -81,6 +81,45 @@ Suggested commit: `chore: scaffold Chrome extension with WXT and React`
 
 ---
 
+## 2026-10-20 — Step 03: Today interface and design foundation
+
+**Status:** Implemented and checked. Not committed or pushed by the assistant.
+
+### Changes
+
+- Replaced the scaffold landing screens with a sage-green Today interface and compact popup.
+- Shared goal cards show sample lessons, progress, streak lengths, and Continue/Done actions.
+- Added daily completion summary, example weekly activity, and a milestone preview.
+- Added hash-based navigation for Today, History, Rewards, Connections, and Settings; future-feature sections explain their current availability.
+- Added selectable sample, empty, and loading previews.
+- Continue actions open a native demo dialog, with keyboard dismissal and focus restoration.
+- Added shared color styles, focus indicators, reduced-motion support, responsive layouts, and DESIGN.md.
+- Updated the README and build checklist.
+
+### Checks
+
+- TypeScript passed; production build and ZIP packaging passed.
+- Browser smoke checks passed for worker startup, popup height under 600px, three sample goals, keyboard navigation, dialog Escape/focus restoration, all five navigation destinations, empty/loading states, reduced motion, reload, and overflow at 1200px, 768px, and 360px.
+- Checked a long goal title for wrapping and confirmed no page errors.
+- Inspected desktop, narrow-layout, and popup screenshots.
+- Measured key color contrast pairs; darkened secondary text after finding insufficient contrast on the milestone background. The corrected pair measures 4.95:1. This is not a full accessibility audit.
+- The initial sandbox build could not replace the OneDrive output directory (EPERM); rebuilding with approved access succeeded.
+
+### Decisions and limitations
+
+- All goals, courses, weekly activity, milestones, and XP remain clearly labeled examples.
+- Continue opens an explanation; real lesson resume, goal creation, persistence, and tracking belong to later steps.
+- The display wordmark `Streak / daily` is provisional, not a finalized product name.
+- No new dependencies, permissions, or cloud services were added.
+
+### Next
+
+Step 04: multiple goals and persistent local storage.
+
+Suggested commit: `feat: add Today interface and shared design styles`
+
+---
+
 ## Entry template
 
 Copy this template above this section when recording the next update:

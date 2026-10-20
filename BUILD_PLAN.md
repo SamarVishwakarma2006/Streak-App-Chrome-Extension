@@ -20,7 +20,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - [x] 00 — Product and architecture documents
 - [x] 01 — Build sequence and development log
 - [x] 02 — Repository housekeeping and extension scaffold
-- [ ] 03 — Design foundation and Today interface
+- [x] 03 — Design foundation and Today interface
 - [ ] 04 — Multiple goals and persistent local storage
 - [ ] 05 — Continue buttons and saved activity locations
 - [ ] 06 — Local streak rules and prototype rewards
@@ -79,6 +79,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Any example content is visibly demo data.
 - Check: popup sizing, keyboard navigation, contrast, and empty/loading states.
 - Suggested commit: `feat: add Today interface and shared design styles`
+- Status: implemented and checked on 2026-10-20. TypeScript, production packaging, keyboard/dialog navigation, preview states, reduced motion, and responsive browser checks passed. All displayed activity remains demo data. Commit/push not recorded.
 
 ## 04 — Multiple goals and persistent local storage
 

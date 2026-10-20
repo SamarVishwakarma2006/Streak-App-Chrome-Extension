@@ -2,7 +2,7 @@
 
 A planned Chrome extension for daily learning goals, automatic activity tracking on supported websites, saved Continue links, milestone points, and optional reminders.
 
-**Current stage:** Step 02 — working Chrome extension scaffold with a popup, dashboard, and background worker. Goal creation, activity tracking, accounts, and rewards are not implemented yet. The extension is not published.
+**Current stage:** Step 03 — Today design preview with shared goal cards, dashboard navigation, and sample/empty/loading states. All goals and progress are demo data. Goal creation, activity tracking, accounts, and rewards are not implemented yet. The extension is not published.
 
 ## Project documents
 
@@ -10,6 +10,7 @@ A planned Chrome extension for daily learning goals, automatic activity tracking
 - [ARCHITECTURE.md](ARCHITECTURE.md) — Tech stack, extension structure, server responsibilities, and data design.
 - [BUILD_PLAN.md](BUILD_PLAN.md) — Numbered implementation steps, checks, and suggested commit messages.
 - [DEVLOG.md](DEVLOG.md) — Completed work and decisions.
+- [DESIGN.md](DESIGN.md) — Visual styles, interaction patterns, and demo boundaries.
 
 ## Stack
 
@@ -35,6 +36,7 @@ If PowerShell blocks npm.ps1, use `npm.cmd` in place of `npm`.
 4. Choose this project's `.output/chrome-mv3` folder, which contains manifest.json.
 5. Pin **Streak Maintaining App** from Chrome's extension menu.
 6. Click its icon, then **Open dashboard**.
+7. Explore the sidebar, use **Preview state** to switch between sample/empty/loading views, and select **Continue** on a sample goal to open the demo explanation.
 
 After a source change, build again and use **Reload** on the extension card. Reload any open extension pages too.
 
@@ -74,6 +76,6 @@ Browser tracking can discourage casual skipping but cannot guarantee that activi
 
 Follow BUILD_PLAN.md one checkpoint at a time. Update DEVLOG.md with each completed checkpoint, review the diff, then commit and push the intended files. GitHub pushes and Chrome Web Store publication are separate operations.
 
-The next implementation checkpoint is **03 — Design foundation and Today interface**.
+The next implementation checkpoint is **04 — Multiple goals and persistent local storage**.
 
 Repository visibility and license are still undecided. No license is granted by this planning document.
