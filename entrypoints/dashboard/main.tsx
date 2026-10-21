@@ -1,7 +1,7 @@
 import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Brand, DaySummary, GoalList, PreviewControl } from '../../src/components/Today';
-import type { PreviewState } from '../../src/demo';
+import { Brand, DaySummary, GoalList, PreviewControl, StreakPreview } from '../../src/components/Today';
+import type { PreviewState } from '../../src/components/Today';
 import { SavedGoals } from '../../src/components/SavedGoals';
 import '../../src/styles/base.css';
 
@@ -59,7 +59,7 @@ function Dashboard() {
         <div className="preview-notice"><span className="notice-dot" aria-hidden="true" /><p>{demo && section === 'today' ? 'You’re exploring sample data. No activity is tracked.' : 'Your goals stay on this device. No websites are connected and tracking is not active yet.'}</p></div>
         {section === 'today' ? !demo ? <SavedGoals /> : <div className="today-layout">
           <div className="today-main"><PreviewControl value={preview} onChange={setPreview} />
-            {preview === 'sample' && <DaySummary />}
+            {preview === 'sample' && <><DaySummary /><StreakPreview /></>}
             <div className="section-heading"><h2>Your daily goals</h2><span>{preview === 'sample' ? '3 sample goals' : 'Preview'}</span></div>
             <GoalList state={preview} />
             <p className="quiet-note">Your progress will be recorded automatically on supported websites.</p>

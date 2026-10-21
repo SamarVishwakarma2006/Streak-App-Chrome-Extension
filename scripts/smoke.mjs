@@ -5,7 +5,7 @@ import { chromium } from 'playwright';
 const extensionPath = path.resolve('.output/chrome-mv3');
 const manifest = JSON.parse(await readFile(path.join(extensionPath, 'manifest.json'), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.deepEqual(manifest.permissions, ['storage']);
+assert.deepEqual(manifest.permissions, ['storage', 'tabs']);
 assert.equal(manifest.host_permissions?.length ?? 0, 0);
 for (const icon of Object.values(manifest.icons)) await access(path.join(extensionPath, icon.replace(/^\//, '')));
 await mkdir('test-results', { recursive: true });
@@ -64,6 +64,13 @@ try {
     await page.getByRole('heading', { name, exact: true }).waitFor();
   }
   await page.getByRole('button', { name: 'Explore design demo' }).click();
+  const prototype = page.getByRole('region', { name: 'Streak rules prototype' });
+  await prototype.getByRole('status').getByText('Current: 7 days · Best: 7 days · Prototype XP: 245', { exact: true }).waitFor();
+  await page.getByLabel('Streak scenario').selectOption('missed');
+  await prototype.getByRole('status').getByText('Current: 0 days · Best: 7 days · Prototype XP: 245', { exact: true }).waitFor();
+  await page.getByLabel('Streak scenario').selectOption('restart');
+  await prototype.getByRole('status').getByText('Current: 1 days · Best: 7 days · Prototype XP: 270', { exact: true }).waitFor();
+  await page.screenshot({ path: 'test-results/streak-preview.png', fullPage: true });
   await page.getByRole('button', { name: 'Continue Learn JavaScript demo' }).click();
   await page.keyboard.press('Escape');
   await page.getByRole('dialog').waitFor({ state: 'hidden' });
@@ -74,6 +81,42 @@ try {
   assert.equal(await page.locator('.skeleton span').first().evaluate(el => getComputedStyle(el).animationName), 'none');
   await page.getByRole('button', { name: 'Back to saved goals' }).click();
   await page.getByRole('heading', { name: 'Learn TypeScript' }).waitFor();
+  // Save a manual bookmark, approving its site separately from tracking.
+  await page.getByRole('button', { name: 'Edit Reading', exact: true }).click();
+  await page.getByLabel('Lesson URL (optional)', { exact: true }).fill('https://learning.example.com/lesson/one?token=discard#private');
+  await page.getByLabel('Lesson title (optional)', { exact: true }).fill('First lesson');
+  await page.getByRole('button', { name: 'Save goal', exact: true }).click();
+  await page.getByRole('alert').getByText('Approve this site', { exact: false }).waitFor();
+  await page.getByRole('checkbox').check();
+  await page.getByRole('button', { name: 'Save goal', exact: true }).click();
+  await page.getByRole('dialog').waitFor({ state: 'hidden' });
+  const savedLocation = await page.evaluate(async () => (await chrome.storage.local.get('goalStore')).goalStore.goals.find(g => g.name === 'Reading').location);
+  assert.deepEqual(savedLocation, { url: 'https://learning.example.com/lesson/one', origin: 'https://learning.example.com', title: 'First lesson' });
+  // Serve a local fixture through routing: no real external service or account required.
+  await context.route('https://learning.example.com/**', route => route.fulfill({ status: 404, contentType: 'text/html', body: '<h1>Lesson moved — sign in or update your link</h1>' }));
+  const opened = context.waitForEvent('page');
+  await page.getByRole('button', { name: 'Continue Reading', exact: true }).click();
+  const lesson = await opened;
+  await lesson.waitForURL(savedLocation.url);
+  const tabCount = context.pages().length;
+  await popup.getByRole('button', { name: 'Continue Reading', exact: true }).click();
+  await popup.getByRole('status').getByText('Lesson opened.', { exact: false }).waitFor();
+  assert.equal(context.pages().length, tabCount, 'Continue must reuse the existing tab');
+  await lesson.close();
+  const reopened = context.waitForEvent('page');
+  await page.getByRole('button', { name: 'Continue Reading', exact: true }).click();
+  await (await reopened).waitForURL(savedLocation.url);
+  const invalidLocations = [
+    { url: 'javascript:alert(1)', origin: 'null', title: '' },
+    { url: 'http://learning.example.com/lesson', origin: 'http://learning.example.com', title: '' },
+    { url: 'https://user:secret@learning.example.com/lesson', origin: 'https://learning.example.com', title: '' },
+    { url: 'https://evil.example.com/lesson', origin: 'https://learning.example.com', title: '' },
+    { url: 'https://127.0.0.1/lesson', origin: 'https://127.0.0.1', title: '' },
+  ];
+  for (const location of invalidLocations) {
+    const result = await page.evaluate(location => chrome.runtime.sendMessage({ type: 'goals', action: 'create', payload: { name: 'Invalid', target: 1, unit: 'lessons', location } }), location);
+    assert.equal(result.ok, false);
+  }
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.screenshot({ path: 'test-results/dashboard.png', fullPage: true });
   for (const width of [1200, 768, 360]) {
@@ -92,6 +135,13 @@ try {
   assert.deepEqual(await restored.evaluate(() => chrome.storage.local.get('goalStore')), before);
   await restored.getByRole('button', { name: 'Show archived', exact: true }).click();
   await restored.getByRole('heading', { name: 'Spanish', exact: true }).waitFor();
+  // Upgrade a real schema-1 record without losing its fields.
+  const migrated = await restored.evaluate(async () => {
+    await chrome.storage.local.set({ goalStore: { version: 1, goals: [{ id: 'legacy', name: 'Old goal', target: 15, unit: 'minutes', archived: true }] } });
+    return chrome.runtime.sendMessage({ type: 'goals', action: 'read' });
+  });
+  assert.equal(migrated.store.version, 2);
+  assert.deepEqual(migrated.store.goals, [{ id: 'legacy', name: 'Old goal', target: 15, unit: 'minutes', archived: true, location: null }]);
   // An unknown future schema must be preserved, never silently cleared.
   await restored.evaluate(() => chrome.storage.local.set({ goalStore: { version: 99, goals: [] } }));
   await restored.getByRole('alert').waitFor();
@@ -99,5 +149,5 @@ try {
   assert.equal(rejected.ok, false);
   assert.equal((await restored.evaluate(() => chrome.storage.local.get('goalStore'))).goalStore.version, 99);
   assert.deepEqual(errors, []);
-  console.log('PASS: create/edit/archive/restore/delete, popup synchronization, validation, browser restart persistence, schema preservation, demo navigation, responsive layouts and no page errors.');
+  console.log('PASS: create/edit/archive/restore/delete, popup synchronization, validation, browser restart persistence, schema migration/preservation, sanitized bookmarks, site approval, tab reuse/reopen, unsafe URL rejection, demo navigation, responsive layouts and no page errors.');
 } finally { await context.close(); }

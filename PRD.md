@@ -214,3 +214,7 @@ Measure setup-to-first-goal conversion, first accepted completion, Continue usag
 ## 17. Change control
 
 This file owns product behavior. ARCHITECTURE.md owns implementation structure. Changes to verification promises, stored data, reward rules, or supported platforms must update both documents where relevant before release.
+
+### Step 05 prototype scope
+
+Before integration discovery, users may explicitly approve a site and save a manual HTTPS lesson bookmark. This is separate from a connected provider and carries no tracking claim. The production provider-only Continue rule above applies to automated adapter resume targets. The prototype strips query strings/fragments and does not yet restore playback positions, verify page availability, or support query-dependent lesson identifiers.

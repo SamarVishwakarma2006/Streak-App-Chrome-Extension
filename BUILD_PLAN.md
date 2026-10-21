@@ -22,8 +22,8 @@ You control GitHub publishing. These documents do not record a successful push u
 - [x] 02 — Repository housekeeping and extension scaffold
 - [x] 03 — Design foundation and Today interface
 - [x] 04 — Multiple goals and persistent local storage
-- [ ] 05 — Continue buttons and saved activity locations
-- [ ] 06 — Local streak rules and prototype rewards
+- [x] 05 — Continue buttons and saved activity locations
+- [x] 06 — Local streak rules and prototype rewards
 - [ ] 07 — First integration discovery
 - [ ] 08 — First website adapter and live tracking
 - [ ] 09 — Tracking recovery, duplicate tabs, and pending events
@@ -102,6 +102,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Site-specific position restoration is completed with the adapter in step 08.
 - Check: correct destination, persistence after restart, and rejection of unsafe/unapproved URLs.
 - Suggested commit: `feat: add saved activity locations and Continue actions`
+- Status: implemented and checked on 2026-10-20 for explicitly approved manual HTTPS bookmarks. Provider/activity IDs and playback positions remain adapter-owned in step 08. TypeScript, production ZIP, URL validation, site approval, exact tab reuse/reopen, persistence, migration, and existing lifecycle/demo checks passed. Commit/push not recorded.
 
 ## 06 — Local streak rules and prototype rewards
 
@@ -113,6 +114,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Do not expose a production manual-completion bypass.
 - Check: midnight, missed days, DST, duplicate completions, and one-time milestones.
 - Suggested commit: `feat: implement streak calculations and prototype rewards`
+- Status: implemented and checked on 2026-10-21 as an isolated local prototype engine and read-only fictional scenarios. Date/reward tests, TypeScript, production ZIP, and browser regression checks passed. No completion endpoint or real rewards were added. Commit/push not recorded.
 
 ## 07 — First integration discovery
 

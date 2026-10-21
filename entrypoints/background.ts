@@ -12,14 +12,24 @@ export default defineBackground(() => {
       const store = migrateGoals(saved[STORE_KEY]);
       const { action, payload } = message;
       if (action === 'create') store.goals.push(validateGoal({ ...payload, id: crypto.randomUUID(), archived: false }));
-      else if (['edit', 'archive', 'restore', 'delete'].includes(action)) {
+      else if (['edit', 'archive', 'restore', 'delete', 'continue'].includes(action)) {
         const index = store.goals.findIndex(g => g.id === payload?.id);
         if (index < 0) throw new Error('This goal no longer exists. Reopen the dashboard to refresh.');
-        if (action === 'delete') store.goals.splice(index, 1);
-        else if (action === 'edit') store.goals[index] = validateGoal({ ...store.goals[index], name: payload.name, target: payload.target, unit: payload.unit });
+        const goal = store.goals[index]!;
+        if (action === 'continue') {
+          if (goal.archived || !goal.location) throw new Error('Add a lesson link to an active goal in the dashboard first.');
+          const { url } = goal.location;
+          const tabs = await browser.tabs.query({});
+          const existing = tabs.find(tab => tab.url === url || tab.pendingUrl === url);
+          if (existing?.id !== undefined) {
+            await browser.tabs.update(existing.id, { active: true });
+            await browser.windows.update(existing.windowId, { focused: true });
+          } else await browser.tabs.create({ url });
+        } else if (action === 'delete') store.goals.splice(index, 1);
+        else if (action === 'edit') store.goals[index] = validateGoal({ ...goal, name: payload.name, target: payload.target, unit: payload.unit, location: payload.location });
         else store.goals[index]!.archived = action === 'archive';
       } else if (action !== 'read') throw new Error('Unknown goal action.');
-      if (action !== 'read' || saved[STORE_KEY] === undefined) await browser.storage.local.set({ [STORE_KEY]: store });
+      if (!['read', 'continue'].includes(action) || (saved[STORE_KEY] as { version?: unknown } | undefined)?.version !== 2) await browser.storage.local.set({ [STORE_KEY]: store });
       return { ok: true, store };
     });
     queue = operation.catch(() => {});

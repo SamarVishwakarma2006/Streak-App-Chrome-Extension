@@ -44,3 +44,11 @@ The first real goal-management implementation must distinguish demo content from
 ## Saved goals (Step 04)
 
 Today defaults to real, locally saved goal definitions with New goal, Edit, Archive, Restore, and confirmed Delete actions. Forms use native inputs and dialogs. Cards show the daily target and Not connected status without fabricated progress or XP. The popup lists active goals in a bounded scrolling area. The previous sample dashboard is available through Explore design demo and remains separate from saved data.
+
+## Continue actions (Step 05)
+
+Saved goal cards expose Continue in both popup and dashboard. Without a saved location it is disabled; the popup explains where to add one. Editing a goal includes optional URL/title inputs and explicit site approval. The same form can remove a bookmark by clearing its URL. Continued lessons remain labeled Bookmark / Not connected. The demo screen retains its previous behavior; its data now lives in Today.tsx, and unused compact demo branches/styles have been removed.
+
+## Streak rules preview (Step 06)
+
+Inside the opt-in sample view, Streak scenario compares an unfinished current day, a missed prior day, and restarting after a miss. All results are calculated from fixed fictional completions, labeled Prototype XP, and announced through a status region. The preview cannot modify saved goals or award real points.

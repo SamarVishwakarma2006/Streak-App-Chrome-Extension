@@ -156,3 +156,27 @@ Suggested commit: `type: concise description`
 - Suggested commit: `feat: add persistent goal management`
 - Commit/push: left to the user; not performed or verified.
 - Next: Step 05 — Continue buttons and saved activity locations.
+
+## Step 05 — Saved locations, Continue, and Ponytail cleanup — 2026-10-20
+
+- Added optional lesson URL/title and explicit site approval to goal creation/editing. Blank URLs remove bookmarks. Continue is available in popup/dashboard and opens a new tab or focuses an exact URL match and its window.
+- Added schema 2 with a lossless schema-1 migration. Sanitizes query/fragment data and rejects credentials, non-HTTPS schemes, obvious local/IP destinations, custom ports, and origin mismatches. Validates again when reading saved data before opening it.
+- Added the tabs permission for user-triggered tab matching. No browsing history is persisted or uploaded, and no website host permission is requested.
+- Scope: manual path-based bookmarks only. Missing pages and expired logins are handled by the website; the UI explains editing the link or signing in. Provider activity IDs, query-dependent URLs, automatic checkpoint capture, and playback recovery await approved adapters. Continue never grants progress or XP.
+- Ponytail cleanup: moved single-use demo data into Today.tsx, removed src/demo.ts, removed unused compact branches from demo GoalList/DaySummary and their unused styles. Retained the working demo and shared saved-goal controls. Added no dependencies.
+- Checks passed: TypeScript, production ZIP, the existing goal lifecycle/popup synchronization suite, demo states/navigation, responsive layouts, bookmark approval/sanitization, unsafe destination rejection, tab reuse and reopening after closure, full browser restart persistence, schema-1 migration and unknown-schema preservation. Fixture pages exercised a moved/sign-in destination without needing external accounts. Visually inspected popup and narrow dashboard screenshots.
+- Suggested commit: `feat: add saved activity locations and Continue actions`
+- Commit/push: not performed; left to the user.
+- Next: Step 06 — Local streak rules and prototype rewards.
+
+## Step 06 — Local streak rules and prototype rewards — 2026-10-21
+
+- Added a small dependency-free TypeScript ledger for local calendar dates, current/best streaks, missed days, archive/reactivation, and lifetime XP retention after deletion.
+- Implemented 25 daily XP and lifetime-per-goal bonuses at 3/7/14/30/100 days. Duplicate dates and provider/activity keys cannot award twice, including across goals and deletion. Callers must supply stable, provider-namespaced activity keys.
+- Added rule revisions effective at the next midnight in the old timezone. Uses Intl and actual date boundaries for DST, rejects backdating, and prevents overlapping rewards when zones change. This is prototype logic, not evidence verification.
+- Added a read-only Streak scenario selector inside Explore design demo. Uses fixed fictional events, never saved-goal completions. No manual completion message or tracking claim was added.
+- Checks passed: test:streaks (all milestones, repeated milestone prevention, duplicate dates/activities, missed day, archive/restore/delete, exact midnight, both DST transitions, rule/timezone changes and JSON roundtrip); TypeScript; production ZIP; browser preview assertions and the existing saved-goal/bookmark/persistence regression suite. Visually inspected the preview screenshot.
+- Preserved the uncommitted Step 05 changes. Added no dependencies and kept the new logic in one module with one focused test script.
+- Suggested commit: `feat: implement streak calculations and prototype rewards`
+- Commit/push: not performed or verified; left to the user.
+- Next: Step 07 — choose and investigate the first compatible learning platform.

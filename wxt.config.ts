@@ -5,7 +5,7 @@ export default defineConfig({
   manifestVersion: 3,
   manifest: {
     name: 'Streak Maintaining App',
-    permissions: ['storage'],
+    permissions: ['storage', 'tabs'],
     description: 'Development preview of your daily learning companion.',
     action: { default_title: 'Open Streak Maintaining App' },
     icons: {
