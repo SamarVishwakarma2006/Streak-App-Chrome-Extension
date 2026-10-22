@@ -24,7 +24,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - [x] 04 — Multiple goals and persistent local storage
 - [x] 05 — Continue buttons and saved activity locations
 - [x] 06 — Local streak rules and prototype rewards
-- [ ] 07 — First integration discovery
+- [x] 07 — First integration discovery
 - [ ] 08 — First website adapter and live tracking
 - [ ] 09 — Tracking recovery, duplicate tabs, and pending events
 - [ ] 10 — Cloud database and access rules
@@ -126,6 +126,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Produce an integration note with the exact acceptance rule and limitations.
 - Check: demonstrate that the proposed signals exist on the real target activity.
 - Suggested commit: `docs: define first learning integration and completion rules`
+- Status: discovery completed on 2026-10-22 for GeeksforGeeks free articles. See INTEGRATION_GEEKSFORGEEKS.md for three live page inspections, proposed reading rules, identity/permission constraints, and Step 08 checks. No verified-completion API was identified; distribution permission remains unresolved. Adapter implementation is next.
 - Dependency: provider selection is required here; it does not block steps 02–06.
 
 ## 08 — First website adapter and live tracking

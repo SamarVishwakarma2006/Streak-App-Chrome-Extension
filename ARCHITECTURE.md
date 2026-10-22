@@ -124,7 +124,7 @@ Each adapter declares:
 - Supported playback speeds, visibility rule, and unsupported conditions.
 - Compatibility fixtures and manual validation steps.
 
-The first provider is an unresolved product decision. Begin with an integration discovery note; do not assume a particular platform offers an official completion API.
+The first provider is GeeksforGeeks free articles, selected on 2026-10-22. See [INTEGRATION_GEEKSFORGEEKS.md](INTEGRATION_GEEKSFORGEEKS.md) for inspected page signals, proposed reading rules, and limitations. No official article-completion API was identified; the planned evidence level is Browser tracked.
 
 Executable adapters are bundled in the extension. Remote configuration may disable a broken adapter or change bounded non-executable settings. It must not download scripts or introduce undisclosed functionality.
 

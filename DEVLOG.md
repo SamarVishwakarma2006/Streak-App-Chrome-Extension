@@ -180,3 +180,14 @@ Suggested commit: `type: concise description`
 - Suggested commit: `feat: implement streak calculations and prototype rewards`
 - Commit/push: not performed or verified; left to the user.
 - Next: Step 07 — choose and investigate the first compatible learning platform.
+
+## Step 07 — GeeksforGeeks free-article discovery — 2026-10-22
+
+- User selected GeeksforGeeks free pages. Defined the first activity as reading public text articles, initially Python/DSA templates, with unsupported content explicitly excluded.
+- Inspected Python Variables, Binary Search and the Python Tutorial hub in isolated Chromium: HTTP 200, headings, canonical URLs, nested article containers, visible text and geometry. Used the hub as a negative example because article markup alone does not establish lesson eligibility.
+- Wrote INTEGRATION_GEEKSFORGEEKS.md with canonical identity, proposed active-time and distributed dwell thresholds, idle/background rules, local resume data, permissions and Step 08 acceptance checks.
+- Reviewed official terms and searched for documented completion APIs. No public article-completion API was identified. Recorded Browser tracked limitations and unresolved distribution permission without claiming platform approval.
+- Verification: direct live-page structure inspection and official-source review. No production code changes; application tests/build were not rerun. No article text/HTML was saved in Git.
+- Step 05/06 are now included in local commit f00417e. Remote push was not checked. An unrelated untracked file was left untouched.
+- Suggested commit: `docs: define GeeksforGeeks reading integration`
+- Commit/push: not performed. Next: Step 08 — implement the article adapter and validate the proposed rule.

@@ -2,7 +2,7 @@
 
 A planned Chrome extension for daily learning goals, automatic activity tracking on supported websites, saved Continue links, milestone points, and optional reminders.
 
-**Current stage:** Step 06 — Local streak/reward calculation engine and a read-only fictional preview, alongside saved goals and Continue bookmarks. No real activity tracking or earned rewards yet. The extension is not published.
+**Current stage:** Step 07 — GeeksforGeeks free-article integration discovery complete. The existing extension still has local goals, bookmarks and prototype rewards; live reading tracking is Step 08.
 
 ## Project documents
 
@@ -30,3 +30,7 @@ Repository visibility and license are still undecided. No license is granted by 
 ## Try the streak prototype
 
 Reload the extension, open the dashboard, select **Explore design demo**, then use **Streak scenario**. Seven fictional completions give a seven-day streak and 245 prototype XP. A missed day resets the current streak to zero; the restart scenario shows one day and 270 XP. These controls never mark a saved goal complete.
+
+## First integration
+
+[GeeksforGeeks discovery](INTEGRATION_GEEKSFORGEEKS.md) records inspected public pages, the proposed reading-time/coverage rule, and compatibility limitations. This checkpoint updates documentation; reloading Chrome will not show a new tracker yet. Next: Step 08 — implement the GeeksforGeeks article adapter.
