@@ -67,3 +67,17 @@ Browser mechanisms: [Chrome permissions](https://developer.chrome.com/docs/exten
 - Use local synthetic article fixtures for most regression checks, plus a small live compatibility check. Do not copy third-party articles into tests.
 
 Discovery is complete with the listed limitations. Reading thresholds, overlay handling, optional permissions and resume restoration have not yet been implemented or tested as an adapter. No production UI or manifest changes are included in Step 07.
+
+## Step 08 implementation record (2026-10-22)
+
+Implemented optional-origin connection and runtime script registration for free Python/DSA article pages. The connection chooses one active goal for new articles. The reader maps text to DOM ranges in chunks of **at most 40 words** (within the proposed 100-word upper limit), uses SHA-256 of normalized text locally for content-change detection, and excludes controls/navigation/forms. Smaller chunks keep long code/text sections observable in smaller viewports.
+
+The packaged script reports visible chunks, recent trusted interaction eligibility and bounded metadata. The worker checks top-frame sender origin, current host grant, selected active goal, schema/bounds, active tab and focused window, and caps accepted elapsed time. A baseline is discarded across gaps, focus changes and local date boundaries. Coverage uses geometry plus center hit-testing to reject covering overlays; complex partial/translucent occlusion remains a limitation.
+
+`gfgReading` schema 1 persists partial dwell/seconds, per-date time, qualification date, article/goal binding, resume chunk, and the local prototype ledger. It stores no article prose. Article identity is globally bound to its initial goal; completed articles cannot be re-awarded to another goal. Qualifying articles map to lesson counts, or to minute targets with a new qualifying article on that date. Existing goal target edits schedule a rule revision; archive/restore resets the run using the Step 06 engine. These are local browser records, not accepted cloud completions.
+
+Continue opens/focuses the latest observed article and restores a saved chunk on supported content. Restoration clears the recent-interaction timer and gives no reading credit. Basic partial progress persists across reloads. Worker-restart resume requests, reliable duplicate-tab arbitration, atomic writes/retry queues, and robust crash recovery remain Step 09 work. A local ceiling of 200 article records / 500 chunks per article is explicit; reaching it reports an error rather than deleting data. Privacy/export cleanup arrives in Step 16.
+
+Disconnect clears the selected connection, unregisters future injection and stops current observers/listeners at the next reply. Chrome may retain a managed/required grant; the UI explains removing it in settings. Revoked host access blocks each sample even for an already injected script. Reconnect explicitly re-injects into existing provider tabs.
+
+Validation records and actual remaining limits are in DEVLOG.md. The browser fixture uses synthetic text and an isolated package with the optional origin pre-granted; production permission consent/denial uses Chrome's UI and is still a manual beta acceptance check. Live public-page compatibility confirmed reading signals, not a full live article completion. No video player, quiz or submission adapter is included, and no claim of GeeksforGeeks approval is made.

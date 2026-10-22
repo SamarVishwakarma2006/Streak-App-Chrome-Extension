@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import { articleURL, readingResult, applyReading } from '../src/reading.ts';
+const article = { weights: [100,100,100,100,100], dwell: [0,0,0,0,0], seconds: 0, byDate: {} };
+for (let i=0;i<150;i++) applyReading(article,[4],1,'2026-10-22');
+assert.equal(readingResult(article).qualified,false,'Bottom-only dwell must not qualify');
+assert.equal(readingResult(article).coverage,20);
+for (let i=0;i<30;i++) applyReading(article,[0,1,2],1,'2026-10-22');
+assert.equal(readingResult(article).coverage,80);
+assert.equal(readingResult(article).qualified,true);
+const seconds = article.seconds;
+applyReading(article,[],1,'2026-10-22'); applyReading(article,[0],10,'2026-10-22');
+assert.equal(article.seconds,seconds);
+assert.equal(articleURL('https://www.geeksforgeeks.org/python/python-variables/?private=x#intro'),'https://www.geeksforgeeks.org/python/python-variables/');
+for(const url of ['https://www.geeksforgeeks.org/python/python-programming-language-tutorial/','https://evil.example/python/foo/','http://www.geeksforgeeks.org/python/foo/','https://www.geeksforgeeks.org/explore/','https://www.geeksforgeeks.org/videos/foo/']) assert.throws(()=>articleURL(url));
+console.log('PASS: article identity, exclusions, distributed dwell, time threshold, skipped chunks and observation gap bounds.');

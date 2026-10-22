@@ -5,7 +5,8 @@ import { chromium } from 'playwright';
 const extensionPath = path.resolve('.output/chrome-mv3');
 const manifest = JSON.parse(await readFile(path.join(extensionPath, 'manifest.json'), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.deepEqual(manifest.permissions, ['storage', 'tabs']);
+assert.deepEqual(manifest.permissions, ['storage', 'tabs', 'scripting']);
+assert.deepEqual(manifest.optional_host_permissions, ['https://www.geeksforgeeks.org/*']);
 assert.equal(manifest.host_permissions?.length ?? 0, 0);
 for (const icon of Object.values(manifest.icons)) await access(path.join(extensionPath, icon.replace(/^\//, '')));
 await mkdir('test-results', { recursive: true });
@@ -29,6 +30,8 @@ try {
     await page.getByRole('heading', { name, exact: true }).waitFor();
   }
   for (const name of ['JavaScript', 'Spanish', 'Reading']) await create(name);
+  const denied = await page.evaluate(async()=>chrome.runtime.sendMessage({type:'gfg',action:'connect',payload:{goalId:(await chrome.storage.local.get('goalStore')).goalStore.goals[0].id}}));
+  assert.equal(denied.ok,false,'A connection must require the optional site grant');
   const popup = await context.newPage();
   await popup.setViewportSize({ width: 380, height: 600 });
   await popup.goto(`${base}/popup.html`);

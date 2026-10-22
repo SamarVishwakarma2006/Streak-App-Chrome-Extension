@@ -25,7 +25,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - [x] 05 — Continue buttons and saved activity locations
 - [x] 06 — Local streak rules and prototype rewards
 - [x] 07 — First integration discovery
-- [ ] 08 — First website adapter and live tracking
+- [x] 08 — First website adapter and live tracking
 - [ ] 09 — Tracking recovery, duplicate tabs, and pending events
 - [ ] 10 — Cloud database and access rules
 - [ ] 11 — Sign-in and account connection
@@ -139,6 +139,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Show evidence level, paused/incompatible states, and completion explanation.
 - Check: actual supported lesson flow, navigation, partial playback, seeking, and changed activity identity.
 - Suggested commit: `feat: track activity on the first supported website`
+- Status: implemented and checked on 2026-10-22 for supported GeeksforGeeks free Python/DSA articles. Optional site connection, active reading/coverage, local qualification and prototype rewards, pause/unsupported states, and Continue restoration are implemented. TypeScript, production ZIP, rule/regression/browser checks passed; live Python Variables reading and tutorial-hub rejection confirmed. Native permission consent and broader compatibility remain manual beta checks; robust recovery is step 09.
 
 ## 09 — Tracking recovery, duplicate tabs, and pending events
 

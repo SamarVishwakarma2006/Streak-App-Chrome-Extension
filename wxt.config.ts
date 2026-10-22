@@ -5,7 +5,8 @@ export default defineConfig({
   manifestVersion: 3,
   manifest: {
     name: 'Streak Maintaining App',
-    permissions: ['storage', 'tabs'],
+    permissions: ['storage', 'tabs', 'scripting'],
+    optional_host_permissions: ['https://www.geeksforgeeks.org/*'],
     description: 'Development preview of your daily learning companion.',
     action: { default_title: 'Open Streak Maintaining App' },
     icons: {

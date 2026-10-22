@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Brand, DaySummary, GoalList, PreviewControl, StreakPreview } from '../../src/components/Today';
 import type { PreviewState } from '../../src/components/Today';
 import { SavedGoals } from '../../src/components/SavedGoals';
+import { Connection } from '../../src/components/Connection';
 import '../../src/styles/base.css';
 
 const sections = [
@@ -56,7 +57,7 @@ function Dashboard() {
             <p>{section === 'today' ? 'A good day starts with one small step.' : 'A place for every part of your progress.'}</p></div>
           {section === 'today' && <button className="button button-outline" onClick={() => setDemo(!demo)}>{demo ? 'Back to saved goals' : 'Explore design demo'}</button>}
         </div>
-        <div className="preview-notice"><span className="notice-dot" aria-hidden="true" /><p>{demo && section === 'today' ? 'You’re exploring sample data. No activity is tracked.' : 'Your goals stay on this device. No websites are connected and tracking is not active yet.'}</p></div>
+        <div className="preview-notice"><span className="notice-dot" aria-hidden="true" /><p>{demo && section === 'today' ? 'You’re exploring sample data. No activity is tracked.' : 'Your goals stay on this device. Connect GeeksforGeeks to track supported articles. Rewards are local prototype data.'}</p></div>
         {section === 'today' ? !demo ? <SavedGoals /> : <div className="today-layout">
           <div className="today-main"><PreviewControl value={preview} onChange={setPreview} />
             {preview === 'sample' && <><DaySummary /><StreakPreview /></>}
@@ -77,7 +78,7 @@ function Dashboard() {
             </section>
             <section className="gentle-note"><h3>A fresh start is still progress.</h3><p>Miss a day? Your streak restarts, but everything you’ve learned stays with you.</p></section>
           </aside>
-        </div> : <section className="section-placeholder">
+        </div> : section === 'connections' ? <Connection /> : <section className="section-placeholder">
           <span className="empty-symbol" aria-hidden="true">{upcoming[section].icon}</span>
           <h2>{upcoming[section].title}</h2><p>{upcoming[section].text}</p>
           <a className="button button-outline" href="#today">Back to Today <span aria-hidden="true">→</span></a>

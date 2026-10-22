@@ -188,6 +188,9 @@ button:disabled { opacity: .6; cursor: wait; }
 .saved-goals.compact .goal-card { grid-template-columns: 30px minmax(0, 1fr); }
 .saved-goals .evidence { font-size: 11px; }
 .saved-goals .goal-actions { max-width: 260px; }
+.connection-card { display: grid; gap: 18px; max-width: 780px; }
+.connection-card p { font-size: 13px; }
+.connection-card select { max-width: 100%; }
 
 .site-approval { grid-template-columns: 20px 1fr; align-items: start; }
 .site-approval input { width: auto; margin-top: 5px; }

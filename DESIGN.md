@@ -52,3 +52,7 @@ Saved goal cards expose Continue in both popup and dashboard. Without a saved lo
 ## Streak rules preview (Step 06)
 
 Inside the opt-in sample view, Streak scenario compares an unfinished current day, a missed prior day, and restarting after a miss. All results are calculated from fixed fictional completions, labeled Prototype XP, and announced through a status region. The preview cannot modify saved goals or award real points.
+
+## Reading connection and page panel (Step 08)
+
+Connections now contains the working GeeksforGeeks goal selector, site-consent action, examples and disconnect state. Saved cards show the connected provider and local prototype streak/XP. The page panel lives in a shadow root, displays time/coverage and changes status when paused, disconnected or unsupported. Its Hide action hides the panel for that page without changing the connection. Status text only changes when the message changes to avoid repeated screen-reader announcements. Continue-position recovery clears reading eligibility until fresh user interaction.

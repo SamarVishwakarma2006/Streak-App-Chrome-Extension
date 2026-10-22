@@ -191,3 +191,16 @@ Suggested commit: `type: concise description`
 - Step 05/06 are now included in local commit f00417e. Remote push was not checked. An unrelated untracked file was left untouched.
 - Suggested commit: `docs: define GeeksforGeeks reading integration`
 - Commit/push: not performed. Next: Step 08 — implement the article adapter and validate the proposed rule.
+
+## Step 08 — GeeksforGeeks live article adapter — 2026-10-22
+
+- Added a Connections panel with goal selection and optional GeeksforGeeks host permission. Bundled gfg.js is registered/injected only after a connection. Disconnect stops observation, unregisters future injection and attempts to remove site access, explaining when Chrome retains the grant.
+- Added article recognition, canonical identity, text-range chunks (up to 40 words), local content fingerprint, visible/unoccluded dwell, a 90-second interaction window, and foreground-only sampling. Long gaps and date boundaries add no unobserved time. A shadow-root page panel displays progress and pause/unsupported explanations.
+- Added versioned local reading records, stable article-to-goal binding, qualification-date attribution, daily lesson/minute progress, and the existing prototype streak/XP engine. Duplicate articles cannot re-award. Goal target edits use scheduled rule changes; archive/restore updates the run. Continue saves/restores a chunk position without filling reading coverage.
+- Worker validates sender origin/frame, host grant, active tab/window, goal state, evidence shape and elapsed bounds. The implementation remains Browser tracked; it is not a security boundary against a device owner.
+- Checks passed: TypeScript; production build/ZIP; reading-rule and streak-rule checks; existing goal/bookmark/restart/migration smoke suite with optional-grant denial; a real 60-second synthetic reading qualification with one 25-XP award, repeated-article deduplication, hidden-tab and overlay pause, bottom-skip rejection, Continue restoration without XP, disconnect and extension-page evidence rejection. Test browser pre-grants only the declared optional origin in an isolated copied package; production consent UI is a manual check.
+- Live check in an isolated browser: Python Variables recognized with 755 observed words / 19 chunks and approximately 4 seconds of foreground time; tutorial hub rejected. No full live article completion or platform verification claimed. Visually inspected connection and live-page screenshots.
+- No dependencies added. Basic partial reload recovery is present; durable worker restart coordination, atomic transactions, duplicate-tab leases and retry queues remain Step 09. Reading records are bounded to 200 articles / 500 chunks, with a visible error at the limit. Publication/access terms remain unresolved as recorded in the integration note.
+- Suggested commit: `feat: track GeeksforGeeks reading and local streaks`
+- Commit/push: not performed. The pre-existing unrelated untracked file was left untouched.
+- Next: Step 09 — tracking recovery, duplicate tabs, and pending events.

@@ -13,6 +13,8 @@
     "build": "wxt build -b chrome",
     "zip": "wxt zip -b chrome",
     "typecheck": "tsc --noEmit",
+    "test:reading": "node scripts/reading.mjs",
+    "test:reading:browser": "node scripts/reading-smoke.mjs",
     "test:streaks": "node scripts/streaks.mjs",
     "test:smoke": "node scripts/smoke.mjs",
     "postinstall": "wxt prepare"

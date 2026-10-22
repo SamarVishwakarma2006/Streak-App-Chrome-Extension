@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { cleanLocation, goalRequest, useGoals, type Goal } from '../goals';
+import { useReading } from './Connection';
+import { progress } from '../streaks';
 export function SavedGoals({ compact = false }: { compact?: boolean }) {
   const { store, error } = useGoals();
+  const { data: reading } = useReading();
   const [archived, setArchived] = useState(false);
   const [editor, setEditor] = useState<Goal | 'new' | null>(null);
   const [deleting, setDeleting] = useState<Goal | null>(null);
@@ -28,7 +31,8 @@ export function SavedGoals({ compact = false }: { compact?: boolean }) {
     {visible.length === 0 ? <section className="empty-state"><h3>{archived ? 'No archived goals.' : 'Your next chapter starts here.'}</h3><p>{archived ? 'Archived goals stay saved until you delete them.' : 'Create a daily goal in the dashboard to start building your routine.'}</p></section> :
       <div className={`goal-list saved-goals ${compact ? 'compact' : ''}`}>{visible.map(goal => <article className="goal-card" key={goal.id}>
         <div className="goal-symbol green" aria-hidden="true">↗</div><div className="goal-content"><div className="goal-title-row"><h3>{goal.name}</h3></div>
-          <p className="lesson">{goal.target} {goal.unit} per day</p><p className="evidence">{goal.archived ? 'Archived' : 'Not connected'} · Saved on this device</p>
+          <p className="lesson">{goal.target} {goal.unit} per day</p><p className="evidence">{goal.archived ? 'Archived' : reading?.allowed && reading.state.goalId === goal.id ? 'GeeksforGeeks · Browser tracked' : 'Not connected'} · Saved on this device</p>
+          {reading?.state.ledger.goals[goal.id] && <p className="lesson">{progress(reading.state.ledger, goal.id, Math.max(Date.now(), reading.state.ledger.clock)).current} day streak · {progress(reading.state.ledger, goal.id, Math.max(Date.now(), reading.state.ledger.clock)).xp} local XP</p>}
           {goal.location && <p className="lesson" title={goal.location.url}>{goal.location.title || goal.location.origin} · Bookmark</p>}</div>
         <div className="goal-actions goal-action">
           {!goal.archived && <button className="button" disabled={busy || !goal.location} aria-label={`Continue ${goal.name}`} onClick={() => void mutate('continue', { id: goal.id }, 'Lesson opened. If it moved or asks you to sign in, update the link or sign in on that website.')}>Continue →</button>}
@@ -59,7 +63,7 @@ export function SavedGoals({ compact = false }: { compact?: boolean }) {
           <label>Lesson title (optional)<input name="title" maxLength={120} defaultValue={editor === 'new' ? '' : editor.location?.title ?? ''} /></label>
           <label className="site-approval"><input name="approved" type="checkbox" />I approve opening the site in this lesson URL.</label>
           <p className="evidence">Use a public lesson link without private information. Query parameters and fragments are removed; links that need them are not supported yet. Leave the URL empty to remove a bookmark.</p>
-          <div className="dialog-note">Not connected. This saves your plan; automatic tracking will be available after a supported website is connected.</div>
+          <div className="dialog-note">Use Connections to track GeeksforGeeks articles. Changes to a connected daily target take effect at its next midnight.</div>
           <button className="button" disabled={busy} type="submit">{busy ? 'Saving…' : 'Save goal'}</button>
         </form>}
       {failure && <p role="alert">{failure}</p>}
