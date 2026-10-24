@@ -1,10 +1,16 @@
-import { handleReading, syncReadingGoal, requestResume, readingState } from '../src/reading-worker';
+import { handleReading, syncReadingGoal, requestResume, readingState, recoverAwards } from '../src/reading-worker';
+import { GFG_KEY } from '../src/reading';
 import { browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
 import { migrateGoals, STORE_KEY, validateGoal } from '../src/goals';
 export default defineBackground(() => {
   // Serialize writes so separate dashboard windows cannot overwrite other goals.
   let queue: Promise<unknown> = Promise.resolve();
+  const recover = () => { queue = queue.then(() => recoverAwards()).catch(() => {}); };
+  browser.alarms.onAlarm.addListener(alarm => { if (alarm.name === 'gfg-recovery') recover(); });
+  void browser.alarms.create('gfg-recovery', { periodInMinutes: 1 });
+  recover();
+  browser.tabs.onRemoved.addListener(id => { void browser.storage.session.remove(`gfg-resume:${id}`); });
   browser.runtime.onMessage.addListener((message, sender) => {
     if (!['goals', 'gfg'].includes(message?.type)) return;
     if (sender.id !== browser.runtime.id) return;
@@ -29,14 +35,18 @@ export default defineBackground(() => {
             await browser.windows.update(existing.windowId, { focused: true });
             const state = await readingState();
             const article = state.articles['geeksforgeeks:' + url];
-            if (article) await browser.tabs.sendMessage(existing.id, { type: 'gfg-resume', chunk: article.chunk }).catch(() => {});
-          } else { const opened = await browser.tabs.create({ url }); if (opened.id !== undefined) requestResume(opened.id); }
+            if (article) await browser.tabs.sendMessage(existing.id, { type: 'gfg-resume', chunk: article.chunk, fingerprint: article.fingerprint }).catch(() => {});
+          } else {
+            const article = (await readingState()).articles['geeksforgeeks:' + url];
+            const opened = await browser.tabs.create({ url });
+            if (opened.id !== undefined && article) await requestResume(opened.id, url, article.fingerprint, article.chunk);
+          }
         } else if (action === 'delete') store.goals.splice(index, 1);
         else if (action === 'edit') store.goals[index] = validateGoal({ ...goal, name: payload.name, target: payload.target, unit: payload.unit, location: payload.location });
         else store.goals[index]!.archived = action === 'archive';
       } else if (action !== 'read') throw new Error('Unknown goal action.');
-      if (!['read', 'continue'].includes(action) || (saved[STORE_KEY] as { version?: unknown } | undefined)?.version !== 2) await browser.storage.local.set({ [STORE_KEY]: store });
-      if (['edit', 'archive', 'restore', 'delete'].includes(action)) await syncReadingGoal(action, payload.id, store);
+      const reading = ['edit', 'archive', 'restore', 'delete'].includes(action) ? await syncReadingGoal(action, payload.id, store) : undefined;
+      if (!['read', 'continue'].includes(action) || (saved[STORE_KEY] as { version?: unknown } | undefined)?.version !== 2) await browser.storage.local.set({ [STORE_KEY]: store, ...(reading ? { [GFG_KEY]: reading } : {}) });
       return { ok: true, store };
     });
     queue = operation.catch(() => {});

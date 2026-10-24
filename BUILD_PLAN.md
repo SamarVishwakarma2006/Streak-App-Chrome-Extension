@@ -26,7 +26,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - [x] 06 — Local streak rules and prototype rewards
 - [x] 07 — First integration discovery
 - [x] 08 — First website adapter and live tracking
-- [ ] 09 — Tracking recovery, duplicate tabs, and pending events
+- [x] 09 — Tracking recovery, duplicate tabs, and pending events
 - [ ] 10 — Cloud database and access rules
 - [ ] 11 — Sign-in and account connection
 - [ ] 12 — Server completion validation and authoritative XP
@@ -150,6 +150,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Add the bounded pending queue, backoff, and visible recovery/error states.
 - Check: duplicate tabs, abrupt worker termination, browser restart, and disconnected network.
 - Suggested commit: `fix: preserve tracking progress across interruptions`
+- Status: implemented on 2026-10-22. Durable local award events, retry backoff, duplicate-tab timing, restart-safe checkpoints, and recovery status are included. Browser recovery checks cover worker stop, browser restart, offline reading, stable IDs, and replay deduplication. This queue applies local prototype rewards; cloud ingestion remains steps 12-13.
 
 ## 10 — Cloud database and access rules
 
@@ -288,6 +289,6 @@ Every implementation handoff should include:
 - How to try the update.
 - Checks actually run and their results.
 - Remaining limitations or external dependencies.
-- Suggested commit message and next step.
+- Copy-paste PowerShell commands to stage only this checkpoint, review, commit, and push; plus the next step.
 
 DEVLOG entries belong in the same commit as the work they describe. Git supplies commit hashes and history; do not add an extra commit merely to record the preceding commit's hash.

@@ -74,11 +74,12 @@ export default defineUnlistedScript(() => {
     window.scrollBy({ top: range.getBoundingClientRect().top - 100, behavior: 'instant' });
     lastInteraction = -Infinity; // Continue restores position independently from reading credit.
   }
-  const resumeMessage = (message: any) => { if (message?.type === 'gfg-resume' && Number.isInteger(message.chunk)) resume(message.chunk); };
+  const resumeMessage = (message: any) => { if (message?.type === 'gfg-resume' && message.fingerprint === fingerprint && !dirty && Number.isInteger(message.chunk)) resume(message.chunk); };
   browser.runtime.onMessage.addListener(resumeMessage);
+  let failures = 0, retryAt = 0;
   let timer: ReturnType<typeof setInterval>;
   const tick = async () => {
-    if (busy) return;
+    if (busy || performance.now() < retryAt) return;
     busy = true;
     try {
       if (dirty || lastIdentity !== location.href || !body?.isConnected) await identify();
@@ -87,6 +88,7 @@ export default defineUnlistedScript(() => {
       const eligible = document.visibilityState === 'visible' && document.hasFocus() && now - lastInteraction <= 90000 && gap <= 2000 && visible.length > 0;
       const answer = await browser.runtime.sendMessage({ type: 'gfg', action: 'sample', payload: { url, title, fingerprint, weights: chunks.map(c => c.words), visible, eligible, chunk: visible[0] ?? 0 } });
       if (!answer?.ok) throw new Error(answer?.error || 'Tracking unavailable. Reload this page.');
+      failures = 0; retryAt = 0;
       if (status.textContent !== answer.status) status.textContent = answer.status;
       if (answer.stopped) {
         clearInterval(timer); observer?.disconnect(); global.__streakReader = false;
@@ -99,7 +101,13 @@ export default defineUnlistedScript(() => {
         details.textContent = `${answer.seconds} / ${answer.required} active seconds · ${answer.coverage}% / 80% coverage. Keep reading; no proof of learning is claimed.`;
       }
       if (Number.isInteger(answer.resume) && answer.fingerprint === fingerprint) resume(answer.resume);
-    } catch (e) { status.textContent = e instanceof Error ? e.message : 'Tracking unavailable. Reload the page.'; }
+    } catch (e) {
+      failures++;
+      const delay = Math.min(30000, 1000 * 2 ** Math.min(failures, 5));
+      retryAt = performance.now() + delay;
+      lastInteraction = -Infinity;
+      status.textContent = `${e instanceof Error ? e.message : 'Tracking unavailable.'} Retrying in ${delay / 1000}s. Saved progress is kept; reading is paused.`;
+    }
     finally { busy = false; }
   };
   timer = setInterval(() => void tick(), 1000); void tick();

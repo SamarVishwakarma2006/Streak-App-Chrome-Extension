@@ -204,3 +204,15 @@ Suggested commit: `type: concise description`
 - Suggested commit: `feat: track GeeksforGeeks reading and local streaks`
 - Commit/push: not performed. The pre-existing unrelated untracked file was left untouched.
 - Next: Step 09 — tracking recovery, duplicate tabs, and pending events.
+
+
+## Step 09 - Tracking recovery (2026-10-22)
+
+- Fixed hidden duplicate tabs clearing the focused reader's timing baseline. Only the active reader can replace another tab's baseline; worker restart starts a fresh baseline without crediting downtime.
+- Added durable local completion events with UUIDs, deterministic daily keys, original timestamps and a 1,000-event ceiling. Saved checkpoints precede award processing; ledger updates and queue removal share one persisted value. Replay checks prevent duplicate XP.
+- Added persisted error/retry metadata, exponential backoff capped at five minutes, automatic recovery on wake/requests/one-minute alarms, and a pending recovery message in Connections. Reading and goal rule changes wait for pending awards so local events retain their order.
+- Moved new-tab Continue intents to session storage with expiry and content identity checks. Existing-tab restoration checks the content fingerprint. Goal changes and their reading-rule updates use one storage API call.
+- Added content-script retry messages with a two-to-thirty-second backoff and fresh interaction requirement. No dependency added; alarms permission supports recovery while Chrome is open.
+- Validation: typecheck, production build/ZIP, reading-rule and streak-rule checks passed. The new isolated Chromium recovery check passed duplicate-tab timing, loaded-page offline reading, abrupt worker stop, browser restart, stable pending IDs, replay deduplication and retained errors/backoff. Existing goal/UI/browser smoke check passed. Full reading browser regression also passed genuine 60-second qualification, 25 XP, repeated-article deduplication, hidden/overlay pause, bottom-skip rejection, Continue restoration, disconnect and forged extension-page message rejection.
+- Limits: checkpoints acknowledged before interruption survive; the final unacknowledged sample can be lost. Chrome can delay alarms. This is a local prototype award queue, not cloud synchronization or trusted XP. Cloud schema is Step 10; ingestion/sync remain Steps 12-13. Local pending awards are preserved rather than expired under the future cloud queue policy.
+- Handoff includes exact PowerShell stage/commit/push commands; user performs GitHub publication. No commit or push performed by the agent. Suggested commit: `fix: preserve tracking progress across interruptions`.

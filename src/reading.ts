@@ -4,7 +4,8 @@ export const GFG_KEY = 'gfgReading';
 export const GFG_ORIGIN = 'https://www.geeksforgeeks.org/*';
 export const GFG_SCRIPT = 'gfg-reader';
 export type Article = { url: string; title: string; fingerprint: string; weights: number[]; dwell: number[]; seconds: number; byDate: Record<string, number>; goalId: string; completed: boolean; qualifiedOn?: string; chunk: number };
-export type ReadingState = { version: 1; goalId: string | null; timezone: string; articles: Record<string, Article>; ledger: PrototypeLedger };
+export type PendingAward = { id: string; goalId: string; activity: string; amount: number; unit: 'minutes' | 'lessons'; at: number; attempts: number; retryAt: number; error?: string };
+export type ReadingState = { version: 1; goalId: string | null; timezone: string; articles: Record<string, Article>; ledger: PrototypeLedger; pending?: PendingAward[] };
 export function articleURL(input: string): string {
   const url = new URL(input);
   if (url.origin !== 'https://www.geeksforgeeks.org' || url.username || url.password ||

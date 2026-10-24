@@ -5,7 +5,7 @@ import { chromium } from 'playwright';
 const extensionPath = path.resolve('.output/chrome-mv3');
 const manifest = JSON.parse(await readFile(path.join(extensionPath, 'manifest.json'), 'utf8'));
 assert.equal(manifest.manifest_version, 3);
-assert.deepEqual(manifest.permissions, ['storage', 'tabs', 'scripting']);
+assert.deepEqual(manifest.permissions, ['storage', 'tabs', 'scripting', 'alarms']);
 assert.deepEqual(manifest.optional_host_permissions, ['https://www.geeksforgeeks.org/*']);
 assert.equal(manifest.host_permissions?.length ?? 0, 0);
 for (const icon of Object.values(manifest.icons)) await access(path.join(extensionPath, icon.replace(/^\//, '')));

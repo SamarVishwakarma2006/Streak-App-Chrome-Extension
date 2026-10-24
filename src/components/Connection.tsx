@@ -42,6 +42,7 @@ export function Connection() {
     <div className="goal-actions"><button className="button" disabled={busy || !goalId} onClick={() => void connect()}>Connect GeeksforGeeks</button>
       {data?.state.goalId && <button className="button button-outline" disabled={busy} onClick={async () => { setBusy(true); try { const result = await readingRequest('disconnect'); setMessage(result.allowed ? 'Disconnected. Chrome retained site access; you can remove it in extension settings.' : 'Disconnected. Saved progress remains on this device.'); } catch (e) { setMessage((e as Error).message); } finally { setBusy(false); } }}>Disconnect</button>}</div>
     <p role="status">{message || (data?.state.goalId && data.allowed ? `Connected to ${store?.goals.find(g => g.id === data.state.goalId)?.name ?? 'saved goal'}.` : 'Not connected.')}</p>
+    {!!data?.state.pending?.length && <p role="status">{data.state.pending.length} saved local reward(s) awaiting recovery. Retries run automatically; reading pauses until recovery finishes. {data.state.pending[0]?.error}</p>}
     {(error || goalsError) && <p role="alert">{error || goalsError}</p>}
     <p className="quiet-note">Supported examples: <a href="https://www.geeksforgeeks.org/python/python-variables/" target="_blank" rel="noreferrer">Python Variables</a> · <a href="https://www.geeksforgeeks.org/dsa/binary-search/" target="_blank" rel="noreferrer">Binary Search</a>. Tutorial hubs, quizzes, practice and videos are unsupported.</p>
   </section>;

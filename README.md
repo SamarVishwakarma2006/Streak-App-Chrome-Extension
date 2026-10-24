@@ -2,7 +2,7 @@
 
 A planned Chrome extension for daily learning goals, automatic activity tracking on supported websites, saved Continue links, milestone points, and optional reminders.
 
-**Current stage:** Step 08 — GeeksforGeeks free-article reading adapter, local progress, Continue restoration, and prototype streak/XP updates. No cloud account or server-verified rewards yet. The extension is not published.
+**Current stage:** Step 09 — GeeksforGeeks reading with saved checkpoints, duplicate-tab coordination, and local reward recovery. No cloud account or server-verified rewards yet. The extension is not published.
 
 ## Project documents
 
@@ -23,7 +23,7 @@ Browser tracking can discourage casual skipping but cannot guarantee that activi
 
 Follow BUILD_PLAN.md one checkpoint at a time. Update DEVLOG.md with each completed checkpoint, review the diff, then commit and push the intended files. GitHub pushes and Chrome Web Store publication are separate operations.
 
-The next implementation checkpoint is **09 — Tracking recovery, duplicate tabs, and pending events**.
+The next implementation checkpoint is **10 — Cloud database and access rules**.
 
 Repository visibility and license are still undecided. No license is granted by this planning document.
 
@@ -44,10 +44,20 @@ Reload the extension, open the dashboard, select **Explore design demo**, then u
 5. Read normally, keeping the tab focused. Interact within each 90-second window and spend time across the article. The required active time is at least 60 seconds, scaled by article length; at least 80% of text chunks need dwell time. Scrolling to the bottom alone does not count.
 6. After qualification, the selected goal gets local daily progress. Once its target is met, the card shows its streak and local prototype XP. Continue returns to the latest observed article and its saved position.
 
-The scripting permission is required; GeeksforGeeks host access is optional and requested during connection. The bookmark site-approval checkbox alone does not connect tracking. Disconnect stops the adapter; revoke site access in Chrome settings if Chrome retains a managed grant.
+The scripting and recovery-alarm permissions are required; GeeksforGeeks host access is optional and requested during connection. The bookmark site-approval checkbox alone does not connect tracking. Disconnect stops the adapter; revoke site access in Chrome settings if Chrome retains a managed grant.
 
 Only supported individual free Python/DSA articles are included. Tutorial hubs, videos, quizzes, practice, paid pages and other templates are unsupported. A page layout change can pause tracking. Local rewards can be edited by the device owner and are never imported as trusted cloud XP.
 
 Checks: `npm.cmd run test:reading`, `npm.cmd run test:reading:browser`, and `npm.cmd run test:smoke` (after a build). Browser checks need the installed Playwright Chromium. The reading browser test runs a real 60-second threshold on synthetic content in an isolated test package; it pre-grants only the declared optional host to avoid automating Chrome's consent dialog. Add `--live` when invoking `node scripts/reading-smoke.mjs --live` for a small public-page compatibility check.
 
-Next checkpoint: **09 — Tracking recovery, duplicate tabs, and pending events**.
+Next checkpoint: **10 — Cloud database and access rules**.
+
+## Step 09: interruption recovery
+
+Reload the extension at chrome://extensions after building, then refresh open GeeksforGeeks pages. Open the same supported article in two tabs: only the focused tab contributes time. Close and reopen the browser to continue from saved reading progress. Already loaded articles can track while offline; loading a new article still needs the website.
+
+Local completion events are saved before rewards are applied, with stable UUIDs and daily deduplication keys. Retries preserve the original qualification time. Connections shows pending local rewards and errors. Reading pauses while an award needs recovery. Retries back off up to five minutes and run on extension wake, requests, and a one-minute Chrome alarm. Chrome may delay alarms while asleep or closed.
+
+The local queue is capped at 1,000 events and preserves pending records rather than silently discarding them. Normal operation drains it immediately. This is not the future cloud upload queue: prototype XP will never be uploaded as trusted rewards. A crash can lose the most recent unacknowledged sample; no time is credited for the interruption. Device owners can still edit local records.
+
+Run `npm.cmd run test:recovery` after building for an isolated browser check of duplicate tabs, offline reading, worker termination, browser restart, award replay, and error backoff. Next: Step 10, cloud database schema and access rules.
