@@ -2,7 +2,7 @@
 
 A planned Chrome extension for daily learning goals, automatic activity tracking on supported websites, saved Continue links, milestone points, and optional reminders.
 
-**Current stage:** Step 11 — Settings includes email-code account connection and explicit goal-definition copying. This build stays in local mode until a Supabase project is configured. Cloud activity and authoritative rewards are not connected yet.
+**Current stage:** Step 12 — Server completion validation and XP functions are implemented and tested locally. The extension still tracks local prototype progress; uploading activity and showing cloud results is Step 13. No hosted deployment has occurred.
 
 ## Project documents
 
@@ -23,7 +23,7 @@ Browser tracking can discourage casual skipping but cannot guarantee that activi
 
 Follow BUILD_PLAN.md one checkpoint at a time. Update DEVLOG.md with each completed checkpoint, review the diff, then commit and push the intended files. GitHub pushes and Chrome Web Store publication are separate operations.
 
-The next implementation checkpoint is **12 — Server completion validation and authoritative XP**.
+The next implementation checkpoint is **13 — Cloud synchronization and offline recovery**.
 
 Repository visibility and license are still undecided. No license is granted by this planning document.
 
@@ -50,7 +50,7 @@ Only supported individual free Python/DSA articles are included. Tutorial hubs, 
 
 Checks: `npm.cmd run test:reading`, `npm.cmd run test:reading:browser`, and `npm.cmd run test:smoke` (after a build). Browser checks need the installed Playwright Chromium. The reading browser test runs a real 60-second threshold on synthetic content in an isolated test package; it pre-grants only the declared optional host to avoid automating Chrome's consent dialog. Add `--live` when invoking `node scripts/reading-smoke.mjs --live` for a small public-page compatibility check.
 
-Next checkpoint: **12 — Server completion validation and authoritative XP**.
+Next checkpoint: **13 — Cloud synchronization and offline recovery**.
 
 ## Step 09: interruption recovery
 
@@ -82,3 +82,17 @@ Configured builds support sign-in, session restoration, sign-out and an explicit
 Run `npm.cmd run test:account` for isolated mocked sign-in checks and
 `npm.cmd run test:database` for migration/RLS/RPC checks. Real email delivery and
 hosted account validation still require a development Supabase project. Next is Step 12.
+
+
+## Step 12: see server validation
+
+Run `npm.cmd run test:ingestion` to exercise ownership checks, invalid evidence,
+retries, duplicate rewards, lesson/minute targets, every milestone, missed days and
+transaction rollback in a local PostgreSQL runtime. Run `npm.cmd run test:database`
+for schema/access checks. No cloud account is needed for either check.
+
+See [the Step 12 backend contract](supabase/README.md#step-12-server-completion-validation-and-xp).
+This step changes backend behavior only; there is no new extension screen. Actual
+cloud ingestion, pending/synced UI and offline reconciliation come in Step 13.
+Browser-tracked evidence can still be forged by a device owner; server-controlled
+awards do not make it independently verified.

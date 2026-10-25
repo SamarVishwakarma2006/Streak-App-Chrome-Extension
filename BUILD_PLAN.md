@@ -29,7 +29,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - [x] 09 — Tracking recovery, duplicate tabs, and pending events
 - [x] 10 — Cloud database and access rules (local preparation; hosted setup deferred)
 - [x] 11 — Sign-in and account connection (local implementation; live project checks pending)
-- [ ] 12 — Server completion validation and authoritative XP
+- [x] 12 — Server completion validation and authoritative XP (local SQL checks; deployment/concurrency validation pending)
 - [ ] 13 — Cloud synchronization and offline recovery
 - [ ] 14 — Reminders and notification actions
 - [ ] 15 — History, milestones, and interface completion
@@ -185,6 +185,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Otherwise retain Browser tracked labeling; never imply independent verification.
 - Check: forged user IDs, duplicate/concurrent submissions, invalid evidence, milestone duplicates, and direct reward edits.
 - Suggested commit: `feat: validate completions and award XP on the server`
+- Status: implemented locally on 2026-10-25 as authenticated PostgreSQL RPCs. Ownership, receipt-date/rule validation, bounded reading evidence, persistent rate limits, atomic awards, daily/activity/UUID deduplication and summaries are implemented. SQL tests cover all milestone amounts and rollback on forced write failure. Hosted JWT and simultaneous-connection checks await a development project; extension ingestion wiring is Step 13. Evidence remains Browser tracked.
 
 ## 13 — Cloud synchronization and offline recovery
 

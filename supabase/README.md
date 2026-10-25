@@ -126,3 +126,84 @@ not proof of real email delivery, hosted JWT enforcement or production readiness
 Before release, repeat the flow with a real development project and two real users.
 
 Reference: [Supabase email OTP setup](https://supabase.com/docs/guides/auth/auth-email-passwordless).
+
+
+## Step 12: server completion validation and XP
+
+Apply `202610250003_completion_validation.sql` after the first two migrations.
+The extension will call this API through its signed-in Supabase client in Step 13;
+this checkpoint adds no manual completion button and does not import prototype XP.
+No Edge Function or service-role credential is needed for these authenticated RPCs.
+Supabase's Data API verifies the JWT; each function independently derives auth.uid()
+and checks ownership before privileged writes.
+
+- `set_reading_connection(p_connected boolean)` records explicit account consent
+  for GeeksforGeeks ingestion. A profile (created when copying goals) must exist.
+- `get_streak_summary(p_streak_id uuid)` returns current/best streak, completed-today,
+  active rule ID/target/unit/timezone, goal/account XP, server time and evidence label.
+- `submit_reading_event(p_event_uuid uuid, p_streak_id uuid, p_rule_version_id uuid,
+  p_activity_id text, p_evidence jsonb)` accepts a qualifying article candidate.
+
+Activity IDs are paths such as `/python/python-variables/`, never full URLs. Evidence
+contains exactly these fields (example only, not a claim of actual reading):
+
+```json
+{"schema_version":1,"fingerprint":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","weights":[40,40,20],"dwell":[12,12,6],"active_seconds":60}
+```
+
+The validator checks 1-500 chunks of 1-40 words, at least 100 words, bounded dwell,
+80% word-weighted coverage, and at least max(60, ceil(words * 0.3)) active seconds.
+It rejects additional fields, screenshots/HTML, client dates, user IDs, XP or
+verification labels. Evidence is bounded to 16 KiB after JSON parsing. Configure
+an HTTP request-body limit at the deployment boundary too: SQL cannot bound the
+bytes consumed before a request reaches PostgreSQL. A forged client can still
+fabricate plausible evidence; all accepted records remain **Browser tracked**.
+
+The server uses receipt time after acquiring locks to select the current rule and
+local date. It never backdates browser evidence. Accepted qualified articles count
+once per user/provider across all goals. Lesson targets count accepted articles;
+minute targets sum accepted articles' active seconds on their receipt day. Partial
+or unqualified article time is not submitted in this first server contract. Activity
+collected earlier and uploaded later is attributed to receipt day; Step 13 must
+explain that difference from local preview counts. The server does not accept a
+client-supplied completion or XP total.
+
+One account lock coordinates cross-goal activity credit, then a streak lock protects
+completion writes. Each successful call stores the event, credit, completion and
+awards atomically. An accepted UUID replay returns its original response with
+`replayed: true`; changed payloads under that UUID return EVENT_CONFLICT. Never add
+xp_awarded repeatedly on retries; use the returned authoritative summary (or fetch
+a fresh summary, since a replay's snapshot may be older). Rejections do not claim
+activity or create reward rows. New requests after a completed day return
+already_complete with zero new XP. Business refusals are returned as codes; rejected
+payloads are not retained. Unexpected SQL failures roll back the entire call.
+
+Daily completion earns 25 XP. One-time streak milestones add 20/50/100/250/1000 XP
+at 3/7/14/30/100 days. Missing yesterday resets current streak while retaining best
+and XP. Runs separate reactivations. Receipt dates cannot move backward or overlap
+the previous completion's timezone day. Future rule versions cannot be used early.
+
+Fresh submissions are limited to 60 attempts per account per minute; exact accepted
+replays bypass that counter. There is a 2,000-event daily storage ceiling and an
+86,400-second aggregate budget across the preceding 24 hours. The rate limiter is
+private and persists even for business rejections. Gateway-wide abuse/IP limits,
+monitoring and real concurrent-connection verification remain release prerequisites.
+
+Common response codes: INVALID_ID, PROFILE_MISSING, GOAL_UNAVAILABLE, RATE_LIMIT,
+GOAL_INACTIVE, DISCONNECTED, STALE_RULE, RUN_MISSING, UNSUPPORTED_ACTIVITY,
+INVALID_EVIDENCE, INSUFFICIENT_READING, OVERLAPPING_DAY, ACTIVITY_ALREADY_CREDITED,
+DAILY_EVENT_LIMIT, TIME_BUDGET_EXCEEDED and EVENT_CONFLICT. Rate-limit responses
+include retry_after_seconds; client synchronization/backoff is Step 13.
+
+Run `npm.cmd run test:ingestion` and `npm.cmd run test:database`. Tests use real SQL
+with fictional historical fixtures seeded only by the test database owner. There is
+no production clock override. Checks cover cross-user denial, malformed evidence,
+receipt-date attribution, retries/conflicts, daily/article deduplication, both target
+units, every milestone, missed days, future rules, archive/disconnect, limits and a
+forced reward-write failure proving transactional rollback. PGlite is a single
+connection; actual simultaneous database connections and hosted JWT enforcement
+still require a development Supabase/PostgreSQL instance. No live deployment or
+independent provider verification is claimed.
+
+References: [Supabase database functions](https://supabase.com/docs/guides/database/functions)
+and [PostgreSQL row locks](https://www.postgresql.org/docs/17/explicit-locking.html).

@@ -19,6 +19,7 @@ try {
     insert into auth.users values ('${a}'), ('${b}');`);
   await db.exec(await readFile(new URL('../supabase/migrations/202610250001_initial_schema.sql', import.meta.url), 'utf8'));
   await db.exec(await readFile(new URL('../supabase/migrations/202610250002_account_goals.sql', import.meta.url), 'utf8'));
+  await db.exec(await readFile(new URL('../supabase/migrations/202610250003_completion_validation.sql', import.meta.url), 'utf8'));
   await db.exec(`set role service_role; insert into public.profiles(user_id) values ('${a}'), ('${b}');`);
   const rows = {};
   for (const owner of [a, b]) {

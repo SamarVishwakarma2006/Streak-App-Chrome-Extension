@@ -323,3 +323,39 @@ The background worker owns the Supabase SDK and serializes account operations. B
 Account-goal caches are scoped to project and verified user ID and removed on sign-out/switch. Device prototype goals/reading state retain their existing shared-browser scope and are labeled accordingly; signing in never makes them authoritative account progress. Explicit copy sends only UUID/name/target/unit. The authenticated copy_goal_definitions RPC derives auth.uid(), validates at most 100 definitions, locks the profile, and inserts goals, initial rules and runs transactionally with per-user local-ID deduplication. Its fixed search path and explicit EXECUTE grant restrict the SECURITY DEFINER entry point. Profile timezone is initialized on first copy, not rewritten on every login. No URLs, credentials or XP are copied.
 
 Local tests use mocked Auth responses and the real SQL migration in PGlite. Hosted email/JWT/Data API and concurrent RPC behavior require a real development project. Source implementation is complete locally; no hosted deployment or live sign-in is claimed.
+
+
+### Step 12 implementation: authenticated ingestion and atomic rewards
+
+The third migration implements submit_reading_event, get_streak_summary and
+set_reading_connection as authenticated database RPCs. A separate Edge Function is
+unnecessary for the current database-only validator: the Data API JWT plus auth.uid()
+provide caller identity, and the privileged functions explicitly check ownership.
+Direct client writes remain revoked. Private helpers use fixed search paths and
+restricted grants. No client-supplied date, user, XP or evidence label is accepted.
+
+The reading contract allowlists schema version, fingerprint, bounded chunk weights,
+dwell and active seconds. Qualified distinct articles count toward receipt-day
+lesson targets or minute targets. Minute amounts include qualified articles only;
+partial unqualified reading is not submitted by this initial server API. Step 13
+must keep local preview counts and accepted cloud counts clear. All results remain
+Browser tracked, without provider verification.
+
+A profile lock serializes per-account ingestion/credit/rate state; a streak lock
+protects completion updates. Database receipt time after locks determines rule and
+date. Accepted event UUIDs and payloads are stored for replay/conflict handling.
+The event, activity credit, daily completion, 25 daily XP and one-time milestone
+bonuses commit together. Summary derives current/best from dates and runs and sums
+ledger XP. Future rules and overlapping/backward reward days are rejected.
+
+Private rate state limits fresh attempts to 60/minute/account; exact accepted replays
+are idempotent. Receipt-day accepted events are capped at 2,000 and claimed seconds
+at 86,400 across the preceding 24 hours. Business rejections return codes without
+retaining evidence. A SQL evidence-size bound protects storage after parsing; HTTP
+body and global/IP abuse limits still belong at the deployment boundary.
+
+Local SQL tests verify authorization, evidence checks, every reward milestone,
+replay/deduplication, missed days, scheduled-rule rejection and transactional rollback.
+PGlite cannot establish multi-connection concurrency behavior; row-lock/uniqueness
+checks must also run on a real development database before release. No deployment
+or extension-to-server submission is included in this checkpoint.
