@@ -14,6 +14,7 @@
     "zip": "wxt zip -b chrome",
     "typecheck": "tsc --noEmit",
     "test:account": "node scripts/account.mjs",
+    "test:cloud": "node scripts/cloud.mjs",
     "test:ingestion": "node scripts/ingestion.mjs",
     "test:database": "node scripts/database.mjs",
     "test:recovery": "node scripts/recovery.mjs",

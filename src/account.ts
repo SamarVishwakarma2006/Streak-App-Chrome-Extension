@@ -9,9 +9,9 @@ const storageKey = url ? `auth:${new URL(url).host}` : 'auth:unconfigured';
 const cachePrefix = url ? `account:${new URL(url).host}:` : 'account:unconfigured:';
 async function clearCaches() {
   const saved = await browser.storage.local.get(null);
-  await browser.storage.local.remove(Object.keys(saved).filter(k => k.startsWith(cachePrefix)));
+  await browser.storage.local.remove(Object.keys(saved).filter(k => k.startsWith(cachePrefix) || k === `cloud:${url ?? 'unconfigured'}`));
 }
-async function authClient() {
+export async function authClient() {
   if (!url || !key) throw new Error('Cloud setup is not configured in this build.');
   // Content scripts must never be able to read persisted refresh tokens.
   await browser.storage.local.setAccessLevel({ accessLevel: 'TRUSTED_CONTEXTS' });
@@ -37,7 +37,7 @@ export async function handleAccount(action: string, payload: any, goals: GoalSto
       await clearCaches();
       client = undefined;
     }
-    return { configured: true, user: null, message: revoked ? 'Signed out. Device-only goals remain on this browser.' : 'Signed out on this device. Server revocation could not be confirmed while offline; existing access tokens may remain valid until expiry.' };
+    return { configured: true, user: null, message: revoked ? 'Signed out. Unsynced cloud submissions were discarded; device-only goals remain on this browser.' : 'Signed out on this device; unsynced cloud submissions were discarded. Server revocation could not be confirmed while offline; existing access tokens may remain valid until expiry.' };
   }
   if (action === 'send' || action === 'verify') {
     if (typeof payload?.email !== 'string' || payload.email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email.trim())) throw new Error('Enter a valid email address.');
@@ -64,6 +64,8 @@ export async function handleAccount(action: string, payload: any, goals: GoalSto
   const user = { id: data.user.id, email: data.user.email ?? '' };
   const accountKey = cachePrefix + user.id;
   const saved = await browser.storage.local.get(null);
+  const cloudKey = `cloud:${url ?? 'unconfigured'}`;
+  if ((saved[cloudKey] as { owner?: string } | undefined)?.owner && (saved[cloudKey] as { owner: string }).owner !== user.id) await browser.storage.local.remove(cloudKey);
   await browser.storage.local.remove(Object.keys(saved).filter(k => k.startsWith(cachePrefix) && k !== accountKey));
   if (action === 'copy') {
     const definitions = goals.goals.filter(g => !g.archived).map(g => ({ local_id: g.id, name: g.name, target: g.target, unit: g.unit }));

@@ -4,6 +4,7 @@ import { Brand, DaySummary, GoalList, PreviewControl, StreakPreview } from '../.
 import type { PreviewState } from '../../src/components/Today';
 import { SavedGoals } from '../../src/components/SavedGoals';
 import { Account } from '../../src/components/Account';
+import { CloudProgress } from '../../src/components/CloudProgress';
 import { Connection } from '../../src/components/Connection';
 import '../../src/styles/base.css';
 
@@ -47,19 +48,19 @@ function Dashboard() {
           {section === item.id && <span className="nav-dot" aria-hidden="true" />}
         </a>)}</nav>
       <div className="sidebar-bottom"><span className="seed" aria-hidden="true">↗</span>
-        <p>Small steps.<br /><strong>Lasting habits.</strong></p><span className="version">Local goals · v0.1.0</span>
+        <p>Small steps.<br /><strong>Lasting habits.</strong></p><span className="version">Development · v0.1.0</span>
       </div>
     </aside>
     <div className="workspace">
-      <header className="topbar"><span>Your learning space</span><span className="demo-badge">LOCAL PREVIEW</span></header>
+      <header className="topbar"><span>Your learning space</span><span className="demo-badge">DEVELOPMENT</span></header>
       <main id="main-content" className="dashboard" tabIndex={-1}>
         <div className="page-heading">
           <div><p className="eyebrow">BUILD A LITTLE MOMENTUM</p><h1>{sections.find((item) => item.id === section)?.label}</h1>
             <p>{section === 'today' ? 'A good day starts with one small step.' : 'A place for every part of your progress.'}</p></div>
           {section === 'today' && <button className="button button-outline" onClick={() => setDemo(!demo)}>{demo ? 'Back to saved goals' : 'Explore design demo'}</button>}
         </div>
-        <div className="preview-notice"><span className="notice-dot" aria-hidden="true" /><p>{demo && section === 'today' ? 'You’re exploring sample data. No activity is tracked.' : 'Your goals stay on this device. Connect GeeksforGeeks to track supported articles. Rewards are local prototype data.'}</p></div>
-        {section === 'today' ? !demo ? <SavedGoals /> : <div className="today-layout">
+        <div className="preview-notice"><span className="notice-dot" aria-hidden="true" /><p>{demo && section === 'today' ? 'You’re exploring sample data. No activity is tracked.' : 'Device goals show local prototype progress. Cloud records are shown separately after you enable sync in Settings.'}</p></div>
+        {section === 'today' ? !demo ? <><CloudProgress /><SavedGoals /></> : <div className="today-layout">
           <div className="today-main"><PreviewControl value={preview} onChange={setPreview} />
             {preview === 'sample' && <><DaySummary /><StreakPreview /></>}
             <div className="section-heading"><h2>Your daily goals</h2><span>{preview === 'sample' ? '3 sample goals' : 'Preview'}</span></div>
@@ -79,12 +80,12 @@ function Dashboard() {
             </section>
             <section className="gentle-note"><h3>A fresh start is still progress.</h3><p>Miss a day? Your streak restarts, but everything you’ve learned stays with you.</p></section>
           </aside>
-        </div> : section === 'connections' ? <Connection /> : section === 'settings' ? <Account /> : <section className="section-placeholder">
+        </div> : section === 'connections' ? <Connection /> : section === 'settings' ? <><Account /><CloudProgress controls /></> : <section className="section-placeholder">
           <span className="empty-symbol" aria-hidden="true">{upcoming[section].icon}</span>
           <h2>{upcoming[section].title}</h2><p>{upcoming[section].text}</p>
           <a className="button button-outline" href="#today">Back to Today <span aria-hidden="true">→</span></a>
         </section>}
-        <footer className="dashboard-footer"><span>Built for progress, one day at a time.</span><span>Local storage · No cloud sync</span></footer>
+        <footer className="dashboard-footer"><span>Built for progress, one day at a time.</span><span>Local resume history · Optional account sync</span></footer>
       </main>
     </div>
   </div>;

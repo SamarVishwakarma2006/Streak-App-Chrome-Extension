@@ -1,9 +1,10 @@
 // Shared reading rules. Browser evidence is local and can be fabricated by a device owner.
 import type { PrototypeLedger } from './streaks';
+import type { CloudBinding } from './cloud';
 export const GFG_KEY = 'gfgReading';
 export const GFG_ORIGIN = 'https://www.geeksforgeeks.org/*';
 export const GFG_SCRIPT = 'gfg-reader';
-export type Article = { url: string; title: string; fingerprint: string; weights: number[]; dwell: number[]; seconds: number; byDate: Record<string, number>; goalId: string; completed: boolean; qualifiedOn?: string; chunk: number };
+export type Article = { url: string; title: string; fingerprint: string; weights: number[]; dwell: number[]; seconds: number; byDate: Record<string, number>; goalId: string; completed: boolean; qualifiedOn?: string; completedAt?: number; cloud?: CloudBinding; chunk: number };
 export type PendingAward = { id: string; goalId: string; activity: string; amount: number; unit: 'minutes' | 'lessons'; at: number; attempts: number; retryAt: number; error?: string };
 export type ReadingState = { version: 1; goalId: string | null; timezone: string; articles: Record<string, Article>; ledger: PrototypeLedger; pending?: PendingAward[] };
 export function articleURL(input: string): string {

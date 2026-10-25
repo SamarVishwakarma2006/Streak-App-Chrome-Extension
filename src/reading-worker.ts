@@ -2,6 +2,7 @@ import { browser, type Browser } from 'wxt/browser';
 import { GFG_KEY, GFG_ORIGIN, GFG_SCRIPT, articleURL, readingResult, applyReading, type ReadingState, type Article } from './reading';
 import { newLedger, addGoal, archiveGoal, changeRule, complete, localDate, progress } from './streaks';
 import type { GoalStore } from './goals';
+import { bindCloudArticle } from './cloud';
 const baselines = new Map<number, { at: number; url: string; fingerprint: string; goalId: string }>();
 
 export async function readingState(): Promise<ReadingState> {
@@ -85,6 +86,7 @@ export async function handleReading(action: string, payload: any, sender: Browse
   if (!article || (!article.completed && article.fingerprint !== payload.fingerprint)) {
     if (!article && Object.keys(state.articles).length >= 200) throw new Error('Local article limit reached. Data management will be added before release.');
     article = { url, title: payload.title, fingerprint: payload.fingerprint, weights: payload.weights, dwell: payload.weights.map(() => 0), seconds: 0, byDate: {}, goalId: goal.id, completed: false, chunk: 0 } as Article;
+    article.cloud = await bindCloudArticle(goal.id);
     state.articles[key] = article; baselines.delete(tabId);
   }
   const tab = await browser.tabs.get(tabId), window = await browser.windows.get(tab.windowId);
@@ -101,7 +103,8 @@ export async function handleReading(action: string, payload: any, sender: Browse
   if (active && !article.completed && elapsed > 0 && elapsed <= 2 && localDate(previous!.at, state.timezone) === localDate(now, state.timezone)) applyReading(article, payload.visible, Math.min(1, elapsed), localDate(now, state.timezone));
   if (active) article.chunk = payload.chunk;
   const result = readingResult(article);
-  if (!article.completed && result.qualified) article.completed = true;
+  const qualifiedNow = !article.completed && result.qualified;
+  if (qualifiedNow) { article.completed = true; article.completedAt = now; }
   const daily = Object.entries(state.articles).filter(([, a]) => a.goalId === goal.id && a.completed && (a.byDate[localDate(now, state.timezone)] ?? 0) > 0);
   // Record qualification day separately: earlier partial time never backfills credit.
   if (article.completed && !article.qualifiedOn) article.qualifiedOn = localDate(now, state.timezone);
@@ -119,7 +122,7 @@ export async function handleReading(action: string, payload: any, sender: Browse
   if (saveLocation) { goals.goals[goals.goals.findIndex(g => g.id === goal.id)] = changed; }
   await browser.storage.local.set({ [GFG_KEY]: state, ...(saveLocation ? { goalStore: goals } : {}) });
   const recovered = state.pending?.length ? await recoverAwards() : state;
-  return { status: recovered.pending?.length ? 'Article saved · local reward recovery pending' : article.completed ? 'Article qualified · Browser tracked' : active ? 'Reading · Browser tracked' : 'Paused: focus this page and interact to resume.', ...result, seconds: Math.floor(article.seconds), resume, fingerprint: article.fingerprint };
+  return { status: recovered.pending?.length ? 'Article saved · local reward recovery pending' : article.completed ? 'Article qualified · Browser tracked · Local progress saved' : active ? 'Reading · Browser tracked' : 'Paused: focus this page and interact to resume.', ...result, qualifiedNow, seconds: Math.floor(article.seconds), resume, fingerprint: article.fingerprint };
 }
 export async function syncReadingGoal(action: string, id: string, goals: GoalStore) {
   const state = await recoverAwards();

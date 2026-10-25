@@ -2,7 +2,7 @@
 
 A planned Chrome extension for daily learning goals, automatic activity tracking on supported websites, saved Continue links, milestone points, and optional reminders.
 
-**Current stage:** Step 12 — Server completion validation and XP functions are implemented and tested locally. The extension still tracks local prototype progress; uploading activity and showing cloud results is Step 13. No hosted deployment has occurred.
+**Current stage:** Step 13 — Opt-in cloud activity synchronization and separate server totals are implemented. Local SQL and mocked account/sync checks run without a hosted project. A configured Supabase development project is still required for real sign-in and cloud records; no hosted deployment has occurred.
 
 ## Project documents
 
@@ -23,7 +23,7 @@ Browser tracking can discourage casual skipping but cannot guarantee that activi
 
 Follow BUILD_PLAN.md one checkpoint at a time. Update DEVLOG.md with each completed checkpoint, review the diff, then commit and push the intended files. GitHub pushes and Chrome Web Store publication are separate operations.
 
-The next implementation checkpoint is **13 — Cloud synchronization and offline recovery**.
+The next implementation checkpoint is **14 — Reminders and notification actions**, including the logged contextual learning nudge.
 
 Repository visibility and license are still undecided. No license is granted by this planning document.
 
@@ -50,7 +50,7 @@ Only supported individual free Python/DSA articles are included. Tutorial hubs, 
 
 Checks: `npm.cmd run test:reading`, `npm.cmd run test:reading:browser`, and `npm.cmd run test:smoke` (after a build). Browser checks need the installed Playwright Chromium. The reading browser test runs a real 60-second threshold on synthetic content in an isolated test package; it pre-grants only the declared optional host to avoid automating Chrome's consent dialog. Add `--live` when invoking `node scripts/reading-smoke.mjs --live` for a small public-page compatibility check.
 
-Next checkpoint: **13 — Cloud synchronization and offline recovery**.
+Next checkpoint: **14 — Reminders and notification actions**.
 
 ## Step 09: interruption recovery
 
@@ -96,3 +96,17 @@ This step changes backend behavior only; there is no new extension screen. Actua
 cloud ingestion, pending/synced UI and offline reconciliation come in Step 13.
 Browser-tracked evidence can still be forged by a device owner; server-controlled
 awards do not make it independently verified.
+
+## Step 13: see cloud synchronization
+
+1. Build/reload the extension and open **Settings**. The account and cloud controls are visible without configuration; device-only tracking continues to work.
+2. For real cloud use, follow [the Supabase setup guide](supabase/README.md), apply all three migrations, configure the public project values, rebuild/reload, and sign in.
+3. Create a device goal, connect it to GeeksforGeeks in **Connections**, then use **Copy goal definitions to my account** in Settings.
+4. Press **Enable cloud sync**, then start a supported article you have not already opened with the tracker. Existing article checkpoints and prototype XP are not imported.
+5. After qualification, **Cloud records** in Today, Settings, and the popup shows pending/accepted status and cached server streak/XP totals. Use **Sync and refresh** to fetch current records from other devices.
+
+The server receives a canonical article path and bounded reading evidence; resume URLs, titles and scroll position remain local. Browser evidence is still forgeable. Cloud minute targets count qualified articles only, so totals may differ from the local prototype. Local edits do not change copied cloud targets.
+
+Retries use the same UUID and evidence after interruptions. Automatic retries run after qualification, on worker wake and on the one-minute recovery alarm (Chrome may delay alarms). Offline activity qualifies on the server receipt day, not the day it was read. Pending submissions expire after seven days with a visible explanation. Pause retains queued submissions; sign-out explicitly discards unsynced cloud submissions. Starting sync again uses a new account generation after sign-out, preventing old local history from being imported.
+
+Run `npm.cmd run test:cloud` for an isolated mocked cloud flow, including browser restart, interrupted responses, receipt-day display, stale rules, cross-device duplicates, expiry, pause and account isolation. The check creates `test-results/cloud.png` and `test-results/cloud-popup.png` with fictional records; no real emails or account activity are sent. Browser checks require Playwright Chromium. On this workspace, use `$env:PLAYWRIGHT_BROWSERS_PATH = (Join-Path (Get-Location) 'test-results\browsers')` before running them.

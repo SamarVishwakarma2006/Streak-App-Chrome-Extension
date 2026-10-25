@@ -361,3 +361,15 @@ replay/deduplication, missed days, scheduled-rule rejection and transactional ro
 PGlite cannot establish multi-connection concurrency behavior; row-lock/uniqueness
 checks must also run on a real development database before release. No deployment
 or extension-to-server submission is included in this checkpoint.
+
+## Step 13 implementation note (2026-10-26)
+
+Cloud synchronization is explicitly enabled after sign-in, goal-definition copy and local provider connection. New article checkpoints receive a generation ID, UUID, cloud goal ID and current rule ID. Existing articles are never retroactively bound. Qualification persists its timestamp and evidence in the reading checkpoint before synchronization discovers it. The cloud outbox captures an immutable payload keyed by that UUID; rediscovery after a worker stop cannot duplicate it.
+
+One project-scoped cloud store contains the verified owner, generation, goal summaries and pending/terminal submission records. Cloud/auth operations share a promise queue independent of the reading checkpoint queue, so background network waits do not block sampling. Sign-out/switch clears the cloud store under that lock; UI explains pending loss beforehand. New generations prevent old article bindings from crossing accounts or being imported after sign-out. Content scripts cannot call cloud/account operations or access trusted local storage.
+
+Synchronization runs on qualification, worker wake, one-minute alarm and explicit refresh. Each pass processes at most ten due events; transient failures retain exact IDs/payloads, exponential retry deadlines and a one-minute pass cooldown. Rate limits wait at least one minute. Seven-day expiry and the 1,000-record ceiling are visible; the current 200-article device ceiling bounds normal usage further. Terminal records drop payloads and retain explanations/IDs to prevent repeated submission. Expiry warns that an earlier unconfirmed attempt may have reached the server.
+
+Accepted/replayed responses are never added to local XP. Fresh summary RPCs replace cached server totals, including changes from other devices; their date/fetch time are displayed explicitly. Rejected/stale-rule events are terminal and never silently rewritten under new IDs. Only new articles use refreshed rule mappings. Local goal edits do not mutate the copied cloud definition. Cloud minute totals include only accepted qualified articles and browser credit uses server receipt date. Offline local prototype results remain separate.
+
+No new dependency or database migration is required. Tests exercise extension-to-mocked-service behavior plus the existing real local SQL validator; a real configured Supabase project, HTTP/JWT enforcement and simultaneous database/device checks are still required before release.

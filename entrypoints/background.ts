@@ -1,5 +1,6 @@
 import { handleReading, syncReadingGoal, requestResume, readingState, recoverAwards } from '../src/reading-worker';
 import { handleAccount } from '../src/account';
+import { handleCloud, syncCloud, withCloudLock } from '../src/cloud';
 import { GFG_KEY } from '../src/reading';
 import { browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
@@ -8,20 +9,27 @@ export default defineBackground(() => {
   // Serialize writes so separate dashboard windows cannot overwrite other goals.
   let queue: Promise<unknown> = Promise.resolve();
   const recover = () => { queue = queue.then(() => recoverAwards()).catch(() => {}); };
-  browser.alarms.onAlarm.addListener(alarm => { if (alarm.name === 'gfg-recovery') recover(); });
+  browser.alarms.onAlarm.addListener(alarm => { if (alarm.name === 'gfg-recovery') { recover(); void syncCloud(); } });
   void browser.alarms.create('gfg-recovery', { periodInMinutes: 1 });
   recover();
+  void syncCloud();
   browser.tabs.onRemoved.addListener(id => { void browser.storage.session.remove(`gfg-resume:${id}`); });
   browser.runtime.onMessage.addListener((message, sender) => {
-    if (!['goals', 'gfg', 'account'].includes(message?.type)) return;
+    if (!['goals', 'gfg', 'account', 'cloud'].includes(message?.type)) return;
     if (sender.id !== browser.runtime.id) return;
-    if (['goals', 'account'].includes(message.type) && !sender.url?.startsWith(browser.runtime.getURL('/'))) return;
+    if (['goals', 'account', 'cloud'].includes(message.type) && !sender.url?.startsWith(browser.runtime.getURL('/'))) return;
+    // Cloud networking must not hold up one-second reading checkpoints.
+    if (message.type === 'cloud') return withCloudLock(async () => ({ ok: true, state: await handleCloud(message.action) })).catch(e => ({ ok: false, error: e instanceof Error ? e.message : 'Cloud sync unavailable.' }));
     const operation = queue.then(async () => {
       const saved = await browser.storage.local.get(STORE_KEY);
       const store = migrateGoals(saved[STORE_KEY]);
       const { action, payload } = message;
-      if (message.type === 'account') return { ok: true, ...await handleAccount(action, payload, store) };
-      if (message.type === 'gfg') return { ok: true, ...await handleReading(action, payload, sender, store) };
+      if (message.type === 'account') return { ok: true, ...await withCloudLock(() => handleAccount(action, payload, store)) };
+      if (message.type === 'gfg') {
+        const result = await handleReading(action, payload, sender, store);
+        if ('qualifiedNow' in result && result.qualifiedNow) void syncCloud();
+        return { ok: true, ...result };
+      }
       if (action === 'create') store.goals.push(validateGoal({ ...payload, id: crypto.randomUUID(), archived: false }));
       else if (['edit', 'archive', 'restore', 'delete', 'continue'].includes(action)) {
         const index = store.goals.findIndex(g => g.id === payload?.id);

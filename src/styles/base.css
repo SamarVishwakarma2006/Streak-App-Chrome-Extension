@@ -191,6 +191,12 @@ button:disabled { opacity: .6; cursor: wait; }
 .connection-card { display: grid; gap: 18px; max-width: 780px; }
 .connection-card p { font-size: 13px; }
 .connection-card select { max-width: 100%; }
+.connection-card + .connection-card { margin-top: 20px; }
+.cloud-progress { margin-bottom: 20px; }
+.cloud-progress li { margin-bottom: 8px; overflow-wrap: anywhere; }
+.cloud-progress.is-compact { padding: 12px; gap: 8px; }
+.cloud-progress.is-compact :is(p, h2, ul) { margin: 0; }
+.cloud-progress.is-compact ul { padding-left: 18px; font-size: 12px; }
 
 .site-approval { grid-template-columns: 20px 1fr; align-items: start; }
 .site-approval input { width: auto; margin-top: 5px; }

@@ -30,7 +30,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - [x] 10 — Cloud database and access rules (local preparation; hosted setup deferred)
 - [x] 11 — Sign-in and account connection (local implementation; live project checks pending)
 - [x] 12 — Server completion validation and authoritative XP (local SQL checks; deployment/concurrency validation pending)
-- [ ] 13 — Cloud synchronization and offline recovery
+- [x] 13 — Cloud synchronization and offline recovery (mocked service checks; hosted validation pending)
 - [ ] 14 — Reminders and notification actions
 - [ ] 15 — History, milestones, and interface completion
 - [ ] 16 — Export, deletion, and privacy controls
@@ -196,6 +196,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Preserve event UUIDs across retries and explain rejected or expired submissions.
 - Check: offline-to-online transition, midnight reconnection, conflicting devices, and retry after an interrupted response.
 - Suggested commit: `feat: synchronize activity with authoritative cloud progress`
+- Status: implemented locally on 2026-10-26. Opt-in new-article binding, durable immutable submissions, receipt-date handling, expiry/rejection explanations, separate cached server totals, account isolation and explicit sign-out loss are wired. The existing one-minute alarm retries in the background without holding the reading checkpoint queue. Real Supabase transport/email/JWT and simultaneous-device validation remain external requirements.
 
 ## 14 — Reminders and notification actions
 

@@ -207,3 +207,11 @@ independent provider verification is claimed.
 
 References: [Supabase database functions](https://supabase.com/docs/guides/database/functions)
 and [PostgreSQL row locks](https://www.postgresql.org/docs/17/explicit-locking.html).
+
+## Step 13: extension synchronization
+
+The extension now calls the Step 12 RPCs through its authenticated SDK session. Apply all three migrations before enabling sync. Sign in, copy device goal definitions, connect a device goal to GeeksforGeeks, and enable cloud sync in Settings. Start a new article afterward; existing reading checkpoints and local XP are excluded.
+
+Requests contain only the event UUID, cloud goal/rule IDs, canonical article path and allowed evidence fields. Responses are reconciled by UUID; totals are freshly fetched with get_streak_summary instead of incrementing local XP from a possibly replayed response. RATE_LIMIT schedules a delayed retry, transient errors preserve the immutable request, and business rejections are shown to the user. The server receipt-date policy still applies to offline submissions.
+
+The local cloud queue is owner/generation-scoped and expires pending records after seven days. Pausing retains pending records. Sign-out warns that it discards unsynced records and clears the cloud cache, while shared device-only history remains. Hosted authentication, actual gateway behavior and concurrent-device behavior still need a development project. `npm.cmd run test:cloud` uses a fake network service; it does not deploy or prove those hosted properties.
