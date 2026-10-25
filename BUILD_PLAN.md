@@ -202,9 +202,11 @@ You control GitHub publishing. These documents do not record a successful push u
 **Outcome:** Users can enable reminders that lead directly back to unfinished work.
 
 - Implement reminder settings, quiet hours, alarms, daily deduplication, and Continue actions.
+- Add an opt-in contextual nudge when a user leaves an active supported learning page before today's goal is met; show current/remaining progress and Continue, Snooze, and Dismiss actions.
+- Do not inspect or store destination URLs. Add a grace period and per-session limit; show long-term progress only for a user-defined measurable target.
 - Suppress reminders for completed, archived, or disconnected goals.
 - Explain closed-browser and sleeping-device limitations.
-- Check: permission denial, delayed alarms, quiet hours, restart, and click destination.
+- Check: permission denial, delayed alarms, quiet hours, restart, click destination, normal tab-switch false positives, snooze/dismiss, and per-session deduplication.
 - Suggested commit: `feat: add optional streak reminders`
 
 ## 15 — History, milestones, and interface completion

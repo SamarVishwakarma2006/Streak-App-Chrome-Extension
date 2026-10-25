@@ -203,6 +203,8 @@ Persist pending browser submissions and retry with backoff when connectivity ret
 
 Use Chrome alarms to evaluate reminder eligibility and Chrome notifications to deliver it. Recreate/check alarms on startup and after settings changes. Persist reminder deduplication by streak/date. On delayed wake, suppress expired reminders and reminders that now fall in quiet hours. Chrome being closed or the device asleep prevents guaranteed delivery.
 
+Proposed contextual nudges are triggered only when the user leaves or switches away from an actively tracked supported learning page and today's goal is unfinished. Keep the active streak ID and nudge state locally; do not record or inspect the destination URL. Apply a grace period, per-session deduplication, and an opt-out. The notification may show current daily progress and a user-defined measurable target; do not infer progress toward an open-ended aspiration. Validate required Chrome permissions and notification behavior before implementation.
+
 Server-based email reminders are outside V1. If introduced, they require explicit opt-in, an email provider, a scheduler, and separate delivery/deduplication rules.
 
 ## 13. Privacy, retention, and deletion

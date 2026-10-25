@@ -170,6 +170,12 @@ Authentication credentials are separate from activity history. An account-based 
 - Platform-verified records may use the platform's independently obtained completion time, subject to a documented seven-day reconciliation window.
 - Temporary integration failures must not be presented as proven user inactivity. Provide an explanation and support path; no unverified automatic backfill.
 
+### Proposed: contextual learning nudge
+
+When a user opts in and leaves an active supported learning page before meeting today's goal, offer a small, dismissible reminder to return. It should name the goal, show today's progress and the remaining amount, and show longer-term progress only when the user has set a measurable target. Actions: Continue, snooze, or dismiss. Add a short grace period and limit nudges per learning session so normal navigation does not become spam.
+
+Trigger from leaving or switching away from the currently tracked learning activity. Do not classify arbitrary destination sites as procrastination, read general browsing history, or collect the destination URL. Use a Chrome notification/action rather than injecting UI into unrelated websites. This is an opt-in follow-up to scheduled reminders; permission and usability need validation before implementation.
+
 ## 12. Out of scope
 
 Mobile apps; Firefox/Safari releases; arbitrary user-defined page scripts; universal website compatibility; continuous browser-history collection; facial/attention monitoring; competitive rankings; monetary rewards; AI coaching; social feeds; paid streak repair; and claims of perfect cheating prevention.

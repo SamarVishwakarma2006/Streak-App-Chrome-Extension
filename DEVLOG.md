@@ -1,5 +1,12 @@
 # Development log
 
+## Product idea — Contextual learning nudge (2026-10-25)
+
+- Logged the idea to gently prompt a learner when they leave an active supported lesson before meeting today's goal.
+- The proposed reminder shows the goal, today's progress, and what's left; it can show progress toward a longer-term target only when the user has defined a measurable target. Actions are Continue, Snooze, and Dismiss.
+- Privacy/UX guardrails: opt-in, brief grace period, per-session limit, detect leaving the tracked lesson without storing the destination URL or general browsing history, and use a Chrome notification rather than injecting into other sites.
+- Added it to Step 14 for implementation and validation. It is a planned idea, not an implemented feature.
+
 Record one entry per completed checkpoint or meaningful fix. This is a human-written project history, not a dump of runtime logs or user activity.
 
 Implementation progress and GitHub publishing are separate. An entry means the described files/work exist; it does not mean they have been committed, pushed, deployed, or published.
