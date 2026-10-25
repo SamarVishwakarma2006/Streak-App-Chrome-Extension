@@ -6,6 +6,8 @@ coverage/
 test-results/
 playwright-report/
 .browser-profile/
+supabase/.temp/
+supabase/.branches/
 .env
 .env.*
 !.env.example

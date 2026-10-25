@@ -27,7 +27,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - [x] 07 — First integration discovery
 - [x] 08 — First website adapter and live tracking
 - [x] 09 — Tracking recovery, duplicate tabs, and pending events
-- [ ] 10 — Cloud database and access rules
+- [x] 10 — Cloud database and access rules (local preparation; hosted setup deferred)
 - [ ] 11 — Sign-in and account connection
 - [ ] 12 — Server completion validation and authoritative XP
 - [ ] 13 — Cloud synchronization and offline recovery
@@ -161,6 +161,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Configure a development Supabase project once account access is available.
 - Check: cross-user access fails; direct client completion/XP writes fail; uniqueness constraints hold.
 - Suggested commit: `feat: add database schema and access policies`
+- Status: local preparation completed on 2026-10-25, as requested. Ten-table Supabase migration, explicit grants/RLS, ownership and deduplication constraints, secret/configuration guidance, and executable PostgreSQL checks are ready. Migration/access/constraint tests, typecheck and extension build passed. No hosted project was configured; real Supabase Auth/Data API and concurrency checks remain deployment prerequisites.
 - External dependency: Supabase project/access. Source preparation can proceed before deployment.
 
 ## 11 — Sign-in and account connection

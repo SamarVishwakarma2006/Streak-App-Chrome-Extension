@@ -13,6 +13,7 @@
     "build": "wxt build -b chrome",
     "zip": "wxt zip -b chrome",
     "typecheck": "tsc --noEmit",
+    "test:database": "node scripts/database.mjs",
     "test:recovery": "node scripts/recovery.mjs",
     "test:reading": "node scripts/reading.mjs",
     "test:reading:browser": "node scripts/reading-smoke.mjs",
@@ -25,6 +26,7 @@
     "react-dom": "19.3.1"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.11",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@wxt-dev/module-react": "1.2.2",
