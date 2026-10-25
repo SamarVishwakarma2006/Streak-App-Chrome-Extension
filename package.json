@@ -13,6 +13,7 @@
     "build": "wxt build -b chrome",
     "zip": "wxt zip -b chrome",
     "typecheck": "tsc --noEmit",
+    "test:account": "node scripts/account.mjs",
     "test:database": "node scripts/database.mjs",
     "test:recovery": "node scripts/recovery.mjs",
     "test:reading": "node scripts/reading.mjs",
@@ -22,11 +23,13 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.118.0",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.11",
+    "@types/node": "24.10.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@wxt-dev/module-react": "1.2.2",

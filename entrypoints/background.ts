@@ -1,4 +1,5 @@
 import { handleReading, syncReadingGoal, requestResume, readingState, recoverAwards } from '../src/reading-worker';
+import { handleAccount } from '../src/account';
 import { GFG_KEY } from '../src/reading';
 import { browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
@@ -12,13 +13,14 @@ export default defineBackground(() => {
   recover();
   browser.tabs.onRemoved.addListener(id => { void browser.storage.session.remove(`gfg-resume:${id}`); });
   browser.runtime.onMessage.addListener((message, sender) => {
-    if (!['goals', 'gfg'].includes(message?.type)) return;
+    if (!['goals', 'gfg', 'account'].includes(message?.type)) return;
     if (sender.id !== browser.runtime.id) return;
-    if (message.type === 'goals' && !sender.url?.startsWith(browser.runtime.getURL('/'))) return;
+    if (['goals', 'account'].includes(message.type) && !sender.url?.startsWith(browser.runtime.getURL('/'))) return;
     const operation = queue.then(async () => {
       const saved = await browser.storage.local.get(STORE_KEY);
       const store = migrateGoals(saved[STORE_KEY]);
       const { action, payload } = message;
+      if (message.type === 'account') return { ok: true, ...await handleAccount(action, payload, store) };
       if (message.type === 'gfg') return { ok: true, ...await handleReading(action, payload, sender, store) };
       if (action === 'create') store.goals.push(validateGoal({ ...payload, id: crypto.randomUUID(), archived: false }));
       else if (['edit', 'archive', 'restore', 'delete', 'continue'].includes(action)) {

@@ -18,6 +18,7 @@ try {
     grant execute on function auth.uid() to anon, authenticated, service_role;
     insert into auth.users values ('${a}'), ('${b}');`);
   await db.exec(await readFile(new URL('../supabase/migrations/202610250001_initial_schema.sql', import.meta.url), 'utf8'));
+  await db.exec(await readFile(new URL('../supabase/migrations/202610250002_account_goals.sql', import.meta.url), 'utf8'));
   await db.exec(`set role service_role; insert into public.profiles(user_id) values ('${a}'), ('${b}');`);
   const rows = {};
   for (const owner of [a, b]) {
@@ -64,6 +65,17 @@ try {
   await denied(`update public.streak_rule_versions set target = 0 where id = '${rule.id}'`, '23514');
   await denied(`update public.activity_events set evidence_level = 'platform_verified' where id = '${event.id}'`, '23514');
   await denied(`update public.activity_events set evidence = jsonb_build_object('oversized', repeat('x', 17000)) where id = '${event.id}'`, '23514');
+  await db.exec(`set role authenticated; select set_config('request.jwt.claim.sub', '${a}', false)`);
+  const definitions = JSON.stringify([{ local_id: a, name: 'Copied goal', target: 1, unit: 'lessons', user_id: b, xp: 100000, location: 'https://private.example/' }]);
+  await db.query('select public.copy_goal_definitions($1::jsonb, $2)', [definitions, 'UTC']);
+  await db.query('select public.copy_goal_definitions($1::jsonb, $2)', [definitions, 'UTC']);
+  assert.equal((await query('select * from public.streaks')).length, 2, 'Copy retries do not duplicate goals');
+  assert.equal((await query('select * from public.points_ledger')).length, 3, 'Copy does not import XP');
+  assert.equal((await query(`select * from public.streaks where user_id = '${b}'`)).length, 0);
+  await denied(`select public.copy_goal_definitions('[{"local_id":"${b}","name":"Invalid","target":0,"unit":"lessons"}]', 'UTC')`, '23514');
+  assert.equal((await query('select * from public.streaks')).length, 2, 'Failed import rolls back all its inserts');
+  await db.exec('set role anon');
+  await denied("select public.copy_goal_definitions('[]', 'UTC')", '42501');
   await db.exec(`reset role; delete from auth.users where id = '${a}';`);
   for (const table of tables) assert.deepEqual(await query(`select user_id from public.${table}`), [{ user_id: b }], `${table} cascades deletion without removing another user's records`);
   console.log('PASS: migration, all 10 tables owner-only, client writes denied, anon denied, restricted helper, composite ownership, duplicate events/activity/day/XP, valid rules/evidence bounds, account deletion.');

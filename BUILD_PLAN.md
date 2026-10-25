@@ -28,7 +28,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - [x] 08 — First website adapter and live tracking
 - [x] 09 — Tracking recovery, duplicate tabs, and pending events
 - [x] 10 — Cloud database and access rules (local preparation; hosted setup deferred)
-- [ ] 11 — Sign-in and account connection
+- [x] 11 — Sign-in and account connection (local implementation; live project checks pending)
 - [ ] 12 — Server completion validation and authoritative XP
 - [ ] 13 — Cloud synchronization and offline recovery
 - [ ] 14 — Reminders and notification actions
@@ -173,6 +173,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Never import local prototype XP as trusted cloud rewards.
 - Check: invalid/expired codes, restart, sign-out, account switching, and expired sessions.
 - Suggested commit: `feat: add authentication and account-scoped state`
+- Status: implemented locally on 2026-10-25. Email-code UI/SDK session flow, trusted storage, account caches, sign-out and explicit goal-definition copy RPC are ready. Mocked browser Auth flows and database authorization checks passed. No Supabase project exists yet; actual emails, hosted JWT/API behavior and provider setup remain live validation prerequisites.
 
 ## 12 — Server completion validation and authoritative XP
 
