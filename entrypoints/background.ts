@@ -44,7 +44,7 @@ export default defineBackground(() => {
     if (sender.id !== browser.runtime.id) return;
     if (['goals', 'account', 'cloud', 'reminders'].includes(message.type) && !sender.url?.startsWith(browser.runtime.getURL('/'))) return;
     // Cloud networking must not hold up one-second reading checkpoints.
-    if (message.type === 'cloud') return withCloudLock(async () => ({ ok: true, state: await handleCloud(message.action) })).catch(e => ({ ok: false, error: e instanceof Error ? e.message : 'Cloud sync unavailable.' }));
+    if (message.type === 'cloud') return withCloudLock(async () => ({ ok: true, state: await handleCloud(message.action, message.payload) })).catch(e => ({ ok: false, error: e instanceof Error ? e.message : 'Cloud sync unavailable.' }));
     const operation = queue.then(async () => {
       const saved = await browser.storage.local.get(STORE_KEY);
       const store = migrateGoals(saved[STORE_KEY]);

@@ -123,3 +123,14 @@ The server receives a canonical article path and bounded reading evidence; resum
 Retries use the same UUID and evidence after interruptions. Automatic retries run after qualification, on worker wake and on the one-minute recovery alarm (Chrome may delay alarms). Offline activity qualifies on the server receipt day, not the day it was read. Pending submissions expire after seven days with a visible explanation. Pause retains queued submissions; sign-out explicitly discards unsynced cloud submissions. Starting sync again uses a new account generation after sign-out, preventing old local history from being imported.
 
 Run `npm.cmd run test:cloud` for an isolated mocked cloud flow, including browser restart, interrupted responses, receipt-day display, stale rules, cross-device duplicates, expiry, pause and account isolation. The check creates `test-results/cloud.png` and `test-results/cloud-popup.png` with fictional records; no real emails or account activity are sent. Browser checks require Playwright Chromium. On this workspace, use `$env:PLAYWRIGHT_BROWSERS_PATH = (Join-Path (Get-Location) 'test-results\browsers')` before running them.
+
+## Step 15: see history and rewards
+
+Run npm run build, then reload the unpacked extension at chrome://extensions (load .output/chrome-mv3 on the first run). Open the dashboard and choose **History** or **Rewards**.
+
+- Choose a goal and a calendar month to see recorded completion dates, current/best streak and goal XP. Archived goals retain their history; deleted goals are not in the selector.
+- Rewards shows the 3, 7, 14, 30 and 100-day bonuses. Earned badges come from recorded awards, not from the current streak. Resetting a streak does not erase an earned badge.
+- Choose **Cloud account** for accepted account records. It requires the existing Supabase setup and sign-in. It does not import local records or show pending submissions as completions. Refresh requires a network connection; history is not cached offline.
+- Empty dates mean no recorded completion, not proof that a disconnected user missed a task. Historical dates keep their recorded learning timezone; current stats refer to today, even while viewing an older month.
+
+Run npm run test:history after building for isolated device fixtures and calendar checks; npm run test:cloud also checks cloud history, offline errors and sign-out clearing. Test fixtures never modify your installed extension. A narrow-screen screenshot is written to test-results/history-mobile.png.

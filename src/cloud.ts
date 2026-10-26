@@ -2,6 +2,7 @@ import { browser } from 'wxt/browser';
 import { authClient } from './account';
 import { GFG_KEY, GFG_ORIGIN, type ReadingState } from './reading';
 import { STORE_KEY, type GoalStore } from './goals';
+import { monthDays, type CloudHistory } from './history';
 
 const project = import.meta.env.WXT_SUPABASE_URL as string | undefined;
 export const CLOUD_KEY = `cloud:${project ?? 'unconfigured'}`;
@@ -122,7 +123,28 @@ export function syncCloud() {
   syncing ??= withCloudLock(() => synchronize()).catch(() => {}).finally(() => { syncing = undefined; });
   return syncing;
 }
-export async function handleCloud(action: string) {
+async function readHistory(payload: { month?: string; goalId?: string } = {}): Promise<CloudHistory> {
+  const month = payload.month ?? '';
+  const dates = monthDays(month).flat().filter((d): d is string => !!d);
+  const { client, owner } = await verifiedClient();
+  const goals = await client.from('streaks').select('id,name,status').eq('user_id', owner).order('created_at');
+  if (goals.error || !goals.data) throw new Error('Could not load cloud goals. Retry when online.');
+  const selected = goals.data.find(g => g.id === payload.goalId) ?? goals.data[0];
+  if (!selected) return { goals: [], selectedId: null, record: null, fetchedAt: Date.now() };
+  const [summary, days, awards] = await Promise.all([
+    client.rpc('get_streak_summary', { p_streak_id: selected.id }),
+    client.from('daily_completions').select('local_date').eq('user_id', owner).eq('streak_id', selected.id).gte('local_date', dates[0]).lte('local_date', dates.at(-1)!).order('local_date'),
+    client.from('milestone_awards').select('milestone').eq('user_id', owner).eq('streak_id', selected.id),
+  ]);
+  if (summary.error || !summary.data?.rule_version_id || days.error || awards.error) throw new Error('History could not be loaded. Check your connection and retry.');
+  const s = summary.data;
+  return { goals: goals.data, selectedId: selected.id, fetchedAt: Date.now(), record: {
+    current: s.current, best: s.best, xp: s.xp, today: s.local_date, timezone: s.timezone ?? 'Goal timezone',
+    completedToday: s.completed_today, days: (days.data ?? []).map(d => d.local_date), milestones: (awards.data ?? []).map(a => a.milestone),
+  } };
+}
+export async function handleCloud(action: string, payload?: { month?: string; goalId?: string }) {
+  if (action === 'history') return readHistory(payload);
   if (action === 'read') {
     const state = await cloudState();
     // UI gets status and totals, never evidence payloads or credentials.

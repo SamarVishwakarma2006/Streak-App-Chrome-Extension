@@ -3,6 +3,37 @@
   color: #203e35; background: #f7f8f4; font-synthesis: none; text-rendering: optimizeLegibility; line-height: 1.6;
   --ink: #203e35; --muted: #5b6861; --green: #205841; --surface: #fff; --line: #e0e5dc; --focus: #a44517; --radius: 16px;
 }
+.progress-page { display: grid; gap: 22px; max-width: 920px; }
+.history-toolbar { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; }
+.history-toolbar label { flex: 1 1 180px; min-width: 0; }
+.history-toolbar select, .history-calendar input { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: white; color: var(--ink); font: inherit; }
+.history-calendar input { max-width: 230px; display: block; }
+.progress-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; }
+.progress-stats > div { background: #eef3e8; border-radius: 12px; padding: 18px; }
+.progress-stats dt { font-size: 12px; color: var(--muted); }
+.progress-stats dd { margin: 5px 0 0; font-size: 30px; font-weight: 650; }
+.progress-stats small { font-size: 12px; font-weight: 400; }
+.progress-page h2, .goal-content h3, .cloud-progress li { overflow-wrap: anywhere; }
+.history-calendar table { width: 100%; table-layout: fixed; border-spacing: 5px; text-align: center; }
+.history-calendar caption { text-align: left; padding: 18px 0 10px; font-weight: 650; }
+.history-calendar th { font-size: 12px; font-weight: 500; }
+.history-calendar td { height: 64px; background: #f5f6f1; border-radius: 8px; font-size: 14px; line-height: 1.4; }
+.history-calendar td:empty { background: transparent; }
+.history-calendar .completed-day { background: #205841; color: white; }
+.history-calendar [aria-current="date"] { outline: 2px solid var(--focus); outline-offset: 1px; }
+.reward-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
+.reward-card { padding: 24px; display: grid; gap: 12px; border: 1px solid var(--line); border-radius: 14px; background: white; }
+.reward-card.earned { background: #eef3e8; border-color: #9db69b; }
+.reward-card progress { width: 100%; accent-color: var(--green); }
+input:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+@media (max-width: 480px) {
+  .progress-stats { gap: 6px; }
+  .progress-stats > div { padding: 12px 8px; }
+  .progress-stats dd { font-size: 24px; }
+  .history-calendar { padding: 14px; }
+  .history-calendar table { border-spacing: 3px; }
+  .history-calendar td { height: 48px; }
+}
 * { box-sizing: border-box; }
 body { margin: 0; }
 button, select { font: inherit; cursor: pointer; }
@@ -127,6 +158,7 @@ progress::-moz-progress-bar { background: #64865c; border-radius: 8px; }
 .dialog-note { margin: 20px 0; padding: 12px; background: #eef1e8; border-radius: 8px; font-size: 12px; color: #53624b; }
 .goal-dialog .button { width: 100%; }
 .skip-link { position: fixed; left: 16px; top: -70px; z-index: 5; padding: 10px 16px; background: white; border: 1px solid var(--green); }
+.skip-link:not(:focus) { clip-path: inset(50%); }
 .skip-link:focus { top: 12px; }
 .popup { width: 380px; padding: 18px; }
 .popup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }

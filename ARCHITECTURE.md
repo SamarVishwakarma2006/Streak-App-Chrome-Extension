@@ -385,3 +385,11 @@ Validated foreground samples maintain a minimal reminderSession in session stora
 Reminder mutations and Chrome callbacks use the existing worker serialization queue. Notification-related failures do not roll back saved reading or goal operations. Archived/deleted/disconnected/completed goals and revoked permission invalidate delivery; deletion prunes preferences. General history, unrelated page contents and notification content are never sent to a server. The two native buttons are Continue and Snooze; close is Dismiss. Native OS display and permission prompts remain manual validation; automated checks intercept delivery in an isolated package.
 
 References: [Chrome notifications](https://developer.chrome.com/docs/extensions/reference/api/notifications) and [Chrome alarms](https://developer.chrome.com/docs/extensions/reference/api/alarms).
+
+## Step 15: history and rewards (2026-10-26)
+
+ProgressPage reuses the existing goal/reading hooks and pure streak engine. Device history uses ledger completion dates, milestone awards and per-goal XP; an untracked goal displays zero recorded progress. The month calendar uses UTC only for calendar arithmetic, never to reinterpret a recorded local_date. Completed cells have text equivalents, weekday headings and a today marker. Native month/select controls support keyboard use; responsive cards and global reduced-motion styles apply.
+
+The extension-page-only cloud/history message runs in the existing cloud/auth lock. It verifies the signed-in user, reads their active and archived streak definitions, requests get_streak_summary, and reads a bounded month of daily_completions plus milestone_awards. Existing owner RLS and explicit user/goal filters protect these reads. No queue status or client XP is treated as server history. No migration, new dependency or additional permission is needed.
+
+Cloud history is held in the mounted page only, cleared on source/goal/month changes and authentication-storage changes, and not persisted offline. Cancelled requests cannot update an unmounted or superseded view. Failed reads display an error and retry control rather than zero-filled results. The fetched time makes snapshot freshness explicit. Individual read requests are not an atomic database snapshot; a completion arriving during a fetch may require Refresh to reconcile the calendar and totals.

@@ -220,6 +220,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Complete keyboard support, responsive layout, contrast, and reduced motion.
 - Check: fresh account, populated account, long goal names, multiple goals, and API failure.
 - Suggested commit: `feat: complete progress dashboard and accessible states`
+- Status: implemented on 2026-10-26. History and Rewards now show recorded local or cloud completions, current/best streaks, goal XP and actual milestone awards. Calendar timezone/date semantics, archived/empty/reset states, cloud failures and account-change clearing are covered. Cloud history requires an online configured account; live hosted verification remains a release check.
 
 ## 16 — Export, deletion, and privacy controls
 

@@ -4,7 +4,7 @@ import { useReading } from './Connection';
 import { progress } from '../streaks';
 export function SavedGoals({ compact = false }: { compact?: boolean }) {
   const { store, error } = useGoals();
-  const { data: reading } = useReading();
+  const { data: reading, error: readingError } = useReading();
   const [archived, setArchived] = useState(false);
   const [editor, setEditor] = useState<Goal | 'new' | null>(null);
   const [deleting, setDeleting] = useState<Goal | null>(null);
@@ -27,12 +27,15 @@ export function SavedGoals({ compact = false }: { compact?: boolean }) {
       <div className="goal-actions"><button className="button button-outline" onClick={() => setArchived(!archived)}>{archived ? 'Show active' : 'Show archived'}</button>
       <button className="button" disabled={busy} onClick={() => { setFailure(''); setEditor('new'); }}>New goal</button></div></div>}
     <p role="status" className="quiet-note">{message}</p>
+    {readingError && <p role="alert">{readingError} Reload to retry progress.</p>}
     {failure && !editor && !deleting && <p role="alert">{failure}</p>}
     {visible.length === 0 ? <section className="empty-state"><h3>{archived ? 'No archived goals.' : 'Your next chapter starts here.'}</h3><p>{archived ? 'Archived goals stay saved until you delete them.' : 'Create a daily goal in the dashboard to start building your routine.'}</p></section> :
-      <div className={`goal-list saved-goals ${compact ? 'compact' : ''}`}>{visible.map(goal => <article className="goal-card" key={goal.id}>
+      <div className={`goal-list saved-goals ${compact ? 'compact' : ''}`}>{visible.map(goal => {
+        const summary = reading?.state.ledger.goals[goal.id] ? progress(reading.state.ledger, goal.id, Math.max(Date.now(), reading.state.ledger.clock)) : null;
+        return <article className="goal-card" key={goal.id}>
         <div className="goal-symbol green" aria-hidden="true">↗</div><div className="goal-content"><div className="goal-title-row"><h3>{goal.name}</h3></div>
           <p className="lesson">{goal.target} {goal.unit} per day</p><p className="evidence">{goal.archived ? 'Archived' : reading?.allowed && reading.state.goalId === goal.id ? 'GeeksforGeeks · Browser tracked' : 'Not connected'} · Saved on this device</p>
-          {reading?.state.ledger.goals[goal.id] && <p className="lesson">{progress(reading.state.ledger, goal.id, Math.max(Date.now(), reading.state.ledger.clock)).current} day streak · {progress(reading.state.ledger, goal.id, Math.max(Date.now(), reading.state.ledger.clock)).xp} local XP</p>}
+          {summary && <p className="lesson">{summary.current} day streak · best {summary.best} · {summary.xp} local XP</p>}
           {goal.location && <p className="lesson" title={goal.location.url}>{goal.location.title || goal.location.origin} · Bookmark</p>}</div>
         <div className="goal-actions goal-action">
           {!goal.archived && <button className="button" disabled={busy || !goal.location} aria-label={`Continue ${goal.name}`} onClick={() => void mutate('continue', { id: goal.id }, 'Lesson opened. If it moved or asks you to sign in, update the link or sign in on that website.')}>Continue →</button>}
@@ -42,7 +45,7 @@ export function SavedGoals({ compact = false }: { compact?: boolean }) {
           <button className="button button-outline" disabled={busy} aria-label={`Delete ${goal.name}`} onClick={() => { setFailure(''); setDeleting(goal); }}>Delete</button></>}
           {compact && !goal.location && <span className="evidence">Add a link in the dashboard</span>}
         </div>
-      </article>)}</div>}
+      </article>; })}</div>}
     <dialog ref={dialog} className="goal-dialog" aria-labelledby="goal-editor-title" onCancel={e => { if (busy) e.preventDefault(); }} onClose={() => { setEditor(null); setDeleting(null); setFailure(''); }}>
       <h2 id="goal-editor-title">{deleting ? 'Delete goal?' : editor === 'new' ? 'New daily goal' : 'Edit daily goal'}</h2>
       {deleting ? <><p>Delete “{deleting.name}” from this device? This cannot be undone. Archive it instead to keep it for later.</p>

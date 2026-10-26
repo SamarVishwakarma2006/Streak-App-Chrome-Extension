@@ -41,6 +41,8 @@ async function mock() {
         result = user(sub === accountId ? 'one@example.com' : 'two@example.com');
       } else if (url.includes('/streaks')) result = [{ id: goalId, local_goal_id: globalThis.localId, name: 'Cloud reading', status: 'active' }];
       else if (url.includes('/get_streak_summary')) result = summary;
+      else if (url.includes('/daily_completions')) result = [{local_date:'2026-10-25'},{local_date:'2026-10-26'}];
+      else if (url.includes('/milestone_awards')) result = [{milestone:3}];
       else if (url.includes('/submit_reading_event')) {
         if (globalThis.mode === 'rate') result = { status: 'rejected', code: 'RATE_LIMIT', retry_after_seconds: 60 };
         else if (globalThis.mode === 'stale') result = { status: 'rejected', code: 'STALE_RULE' };
@@ -148,7 +150,22 @@ try {
   await request('cloud', 'pause'); await addArticle('paused-article');
   const count = (await submissions()).length; await request('cloud', 'retry');
   assert.equal((await submissions()).length, count, 'Pause never uploads queued data');
+  await page.goto(base + '/dashboard.html#history');
+  await page.getByLabel('Progress source').selectOption('cloud');
+  await page.getByLabel('Calendar month').fill('2026-10');
+  await page.getByText('2026-10 · 2 completed days', {exact:true}).waitFor();
+  assert.equal(await page.locator('.completed-day').count(),2);
+  assert.ok((await worker.evaluate(()=>globalThis.calls)).some(c=>c.url.includes('/daily_completions') && c.url.includes('user_id=eq.') && c.url.includes('local_date=gte.2026-10-01')));
+  await worker.evaluate(()=>{globalThis.mode='offline';});
+  await page.getByRole('button',{name:'Refresh history'}).click();
+  await page.getByRole('alert').filter({hasText:'Account could not be verified'}).waitFor();
+  assert.equal(await page.locator('.completed-day').count(),0,'Failed refresh does not masquerade as current history');
+  await worker.evaluate(()=>{globalThis.mode='normal';});
+  await page.getByRole('button',{name:'Refresh history'}).click();
+  await page.getByText('2026-10 · 2 completed days',{exact:true}).waitFor();
   await request('account', 'signout'); assert.equal(await read(), undefined);
+  await page.getByRole('alert').filter({hasText:'Sign in again'}).waitFor();
+  assert.equal(await page.locator('.completed-day').count(),0,'Signout clears visible history');
   await request('account', 'verify', { email: 'two@example.com', code: '123456' });
   await request('cloud', 'enable'); await request('cloud', 'retry');
   assert.equal((await read()).events.length, 0, 'Another account cannot inherit old article bindings');

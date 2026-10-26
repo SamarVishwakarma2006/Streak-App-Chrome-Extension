@@ -23,7 +23,8 @@
     "test:reading:browser": "node scripts/reading-smoke.mjs",
     "test:streaks": "node scripts/streaks.mjs",
     "test:smoke": "node scripts/smoke.mjs",
-    "postinstall": "wxt prepare"
+    "postinstall": "wxt prepare",
+    "test:history": "node scripts/history.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.118.0",

@@ -17,14 +17,17 @@ export function CloudProgress({ controls = false, compact = false }: { controls?
   useEffect(() => {
     let alive = true;
     const refresh = async () => {
-      const result = await browser.runtime.sendMessage({ type: 'cloud', action: 'read' });
-      if (alive && result?.ok) setState(result.state);
+      try {
+        const result = await browser.runtime.sendMessage({ type: 'cloud', action: 'read' });
+        if (!result?.ok) throw new Error(result?.error ?? 'Cloud progress could not be loaded.');
+        if (alive) { setState(result.state); setError(''); }
+      } catch (e) { if (alive) setError((e as Error).message); }
     };
     const changed = (changes: Record<string, unknown>, area: string) => { if (area === 'local' && Object.keys(changes).some(k => k.startsWith('cloud:'))) void refresh(); };
     browser.storage.onChanged.addListener(changed); void refresh();
     return () => { alive = false; browser.storage.onChanged.removeListener(changed); };
   }, []);
-  if (!state && !controls) return null;
+  if (!state && !controls && !error) return null;
   const pending = state?.events.filter(e => e.status === 'pending').length ?? 0;
   return <section className={`week-card connection-card cloud-progress${compact ? ' is-compact' : ''}`} aria-label="Cloud progress">
     <p className="eyebrow">CLOUD RECORDS · BROWSER TRACKED</p><h2>Accepted learning.</h2>

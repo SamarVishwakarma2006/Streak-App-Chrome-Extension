@@ -2,6 +2,7 @@ import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Brand, DaySummary, GoalList, PreviewControl, StreakPreview } from '../../src/components/Today';
 import type { PreviewState } from '../../src/components/Today';
+import { ProgressPage } from '../../src/components/ProgressPage';
 import { SavedGoals } from '../../src/components/SavedGoals';
 import { Account } from '../../src/components/Account';
 import { CloudProgress } from '../../src/components/CloudProgress';
@@ -20,12 +21,6 @@ type Section = (typeof sections)[number]['id'];
 function currentSection(): Section {
   return sections.find((section) => section.id === location.hash.slice(1))?.id ?? 'today';
 }
-const upcoming = {
-  history: { title: 'Every day adds up.', text: 'Your calendar and past completions will live here once activity tracking is connected.', icon: '▦' },
-  rewards: { title: 'Consistency deserves a little credit.', text: 'Daily XP and milestone rewards will appear here when accepted activity is recorded. You have not earned points in this preview.', icon: '◇' },
-  connections: { title: 'Your learning, connected.', text: 'No websites are connected yet. Supported learning platforms and their completion rules will be listed here when integrations are ready.', icon: '↗' },
-  settings: { title: 'Make it your routine.', text: 'Reminder times, timezone, account, and data controls will be available here as those features are added.', icon: '☷' },
-};
 
 function Dashboard() {
   const [section, setSection] = useState<Section>(currentSection);
@@ -81,11 +76,7 @@ function Dashboard() {
             </section>
             <section className="gentle-note"><h3>A fresh start is still progress.</h3><p>Miss a day? Your streak restarts, but everything you’ve learned stays with you.</p></section>
           </aside>
-        </div> : section === 'connections' ? <Connection /> : section === 'settings' ? <><Reminders /><Account /><CloudProgress controls /></> : <section className="section-placeholder">
-          <span className="empty-symbol" aria-hidden="true">{upcoming[section].icon}</span>
-          <h2>{upcoming[section].title}</h2><p>{upcoming[section].text}</p>
-          <a className="button button-outline" href="#today">Back to Today <span aria-hidden="true">→</span></a>
-        </section>}
+        </div> : section === 'connections' ? <Connection /> : section === 'settings' ? <><Reminders /><Account /><CloudProgress controls /></> : <ProgressPage key={section} rewards={section === 'rewards'} />}
         <footer className="dashboard-footer"><span>Built for progress, one day at a time.</span><span>Local resume history · Optional account sync</span></footer>
       </main>
     </div>
