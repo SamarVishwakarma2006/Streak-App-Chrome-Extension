@@ -15,6 +15,7 @@
     "typecheck": "tsc --noEmit",
     "test:account": "node scripts/account.mjs",
     "test:cloud": "node scripts/cloud.mjs",
+    "test:reminders": "node scripts/reminders.mjs",
     "test:ingestion": "node scripts/ingestion.mjs",
     "test:database": "node scripts/database.mjs",
     "test:recovery": "node scripts/recovery.mjs",

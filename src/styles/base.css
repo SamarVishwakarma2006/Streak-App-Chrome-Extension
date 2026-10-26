@@ -191,6 +191,9 @@ button:disabled { opacity: .6; cursor: wait; }
 .connection-card { display: grid; gap: 18px; max-width: 780px; }
 .connection-card p { font-size: 13px; }
 .connection-card select { max-width: 100%; }
+.reminder-form { display: grid; gap: 14px; }
+.reminder-form label:not(.site-approval) { display: grid; gap: 6px; font-size: 13px; }
+.reminder-form input:not([type=checkbox]), .reminder-form select { min-height: 40px; width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 8px; font: inherit; background: white; }
 .connection-card + .connection-card { margin-top: 20px; }
 .cloud-progress { margin-bottom: 20px; }
 .cloud-progress li { margin-bottom: 8px; overflow-wrap: anywhere; }

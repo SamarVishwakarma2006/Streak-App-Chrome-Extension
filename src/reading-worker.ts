@@ -1,7 +1,7 @@
 import { browser, type Browser } from 'wxt/browser';
 import { GFG_KEY, GFG_ORIGIN, GFG_SCRIPT, articleURL, readingResult, applyReading, type ReadingState, type Article } from './reading';
 import { newLedger, addGoal, archiveGoal, changeRule, complete, localDate, progress } from './streaks';
-import type { GoalStore } from './goals';
+import type { Goal, GoalStore } from './goals';
 import { bindCloudArticle } from './cloud';
 const baselines = new Map<number, { at: number; url: string; fingerprint: string; goalId: string }>();
 
@@ -18,6 +18,21 @@ export async function registerReader() {
 export async function requestResume(tabId: number, url: string, fingerprint: string, chunk: number) {
   // Session storage survives worker suspension without reusing tab IDs after browser restart.
   await browser.storage.session.set({ [`gfg-resume:${tabId}`]: { url, fingerprint, chunk, expires: Date.now() + 60000 } });
+}
+export async function continueGoal(goal: Goal) {
+  if (goal.archived || !goal.location) throw new Error('Add a lesson link to an active goal in the dashboard first.');
+  const { url } = goal.location;
+  const tabs = await browser.tabs.query({});
+  const existing = tabs.find(tab => tab.url === url || tab.pendingUrl === url);
+  const article = (await readingState()).articles['geeksforgeeks:' + url];
+  if (existing?.id !== undefined) {
+    await browser.tabs.update(existing.id, { active: true });
+    await browser.windows.update(existing.windowId, { focused: true });
+    if (article) await browser.tabs.sendMessage(existing.id, { type: 'gfg-resume', chunk: article.chunk, fingerprint: article.fingerprint }).catch(() => {});
+  } else {
+    const opened = await browser.tabs.create({ url });
+    if (opened.id !== undefined && article) await requestResume(opened.id, url, article.fingerprint, article.chunk);
+  }
 }
 export async function recoverAwards() {
   const state = await readingState();
@@ -122,7 +137,7 @@ export async function handleReading(action: string, payload: any, sender: Browse
   if (saveLocation) { goals.goals[goals.goals.findIndex(g => g.id === goal.id)] = changed; }
   await browser.storage.local.set({ [GFG_KEY]: state, ...(saveLocation ? { goalStore: goals } : {}) });
   const recovered = state.pending?.length ? await recoverAwards() : state;
-  return { status: recovered.pending?.length ? 'Article saved · local reward recovery pending' : article.completed ? 'Article qualified · Browser tracked · Local progress saved' : active ? 'Reading · Browser tracked' : 'Paused: focus this page and interact to resume.', ...result, qualifiedNow, seconds: Math.floor(article.seconds), resume, fingerprint: article.fingerprint };
+  return { status: recovered.pending?.length ? 'Article saved · local reward recovery pending' : article.completed ? 'Article qualified · Browser tracked · Local progress saved' : active ? 'Reading · Browser tracked' : 'Paused: focus this page and interact to resume.', ...result, qualifiedNow, activelyReading: active, goalId: goal.id, seconds: Math.floor(article.seconds), resume, fingerprint: article.fingerprint };
 }
 export async function syncReadingGoal(action: string, id: string, goals: GoalStore) {
   const state = await recoverAwards();

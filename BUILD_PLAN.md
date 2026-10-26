@@ -31,7 +31,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - [x] 11 — Sign-in and account connection (local implementation; live project checks pending)
 - [x] 12 — Server completion validation and authoritative XP (local SQL checks; deployment/concurrency validation pending)
 - [x] 13 — Cloud synchronization and offline recovery (mocked service checks; hosted validation pending)
-- [ ] 14 — Reminders and notification actions
+- [x] 14 — Reminders and notification actions (native OS display/permission prompt remain manual checks)
 - [ ] 15 — History, milestones, and interface completion
 - [ ] 16 — Export, deletion, and privacy controls
 - [ ] 17 — Release validation and operational preparation
@@ -209,6 +209,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Explain closed-browser and sleeping-device limitations.
 - Check: permission denial, delayed alarms, quiet hours, restart, click destination, normal tab-switch false positives, snooze/dismiss, and per-session deduplication.
 - Suggested commit: `feat: add optional streak reminders`
+- Status: implemented on 2026-10-26. Optional notification permission, per-goal daily/contextual preferences, motivation/article milestones, shared daily deduplication, quiet hours, snooze, Continue and dismiss are wired. Contextual detection uses only the tracked source tab/session, with 30 seconds of active reading and a 60-second-away grace period. Browser tests intercept notification delivery and exercise timing/actions; actual OS delivery and native permission UI are manual release checks.
 
 ## 15 — History, milestones, and interface completion
 

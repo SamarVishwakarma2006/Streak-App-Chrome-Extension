@@ -5,6 +5,7 @@ import type { PreviewState } from '../../src/components/Today';
 import { SavedGoals } from '../../src/components/SavedGoals';
 import { Account } from '../../src/components/Account';
 import { CloudProgress } from '../../src/components/CloudProgress';
+import { Reminders } from '../../src/components/Reminders';
 import { Connection } from '../../src/components/Connection';
 import '../../src/styles/base.css';
 
@@ -80,7 +81,7 @@ function Dashboard() {
             </section>
             <section className="gentle-note"><h3>A fresh start is still progress.</h3><p>Miss a day? Your streak restarts, but everything you’ve learned stays with you.</p></section>
           </aside>
-        </div> : section === 'connections' ? <Connection /> : section === 'settings' ? <><Account /><CloudProgress controls /></> : <section className="section-placeholder">
+        </div> : section === 'connections' ? <Connection /> : section === 'settings' ? <><Reminders /><Account /><CloudProgress controls /></> : <section className="section-placeholder">
           <span className="empty-symbol" aria-hidden="true">{upcoming[section].icon}</span>
           <h2>{upcoming[section].title}</h2><p>{upcoming[section].text}</p>
           <a className="button button-outline" href="#today">Back to Today <span aria-hidden="true">→</span></a>

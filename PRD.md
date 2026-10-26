@@ -163,18 +163,20 @@ Authentication credentials are separate from activity history. An account-based 
 ## 11. Reminders and reliability
 
 - Reminders are opt-in and suppressed for completed, archived, or disconnected goals.
-- Support a local reminder time, quiet hours, and at most one reminder per streak per day in V1.
+- Support a local reminder time, quiet hours, and at most one automatic reminder per streak per local day in V1, shared by daily and contextual reminders. A user-requested ten-minute snooze may deliver a follow-up; returning to reading cancels it.
 - Clicking a reminder opens the relevant saved activity.
 - Chrome closure and device sleep can delay or prevent reminders. Never advertise guaranteed delivery in those states.
 - Offline browser events are queued locally and shown as pending. On reconnection, browser-tracked completions qualify on the server receipt date, not a user-supplied historical date.
 - Platform-verified records may use the platform's independently obtained completion time, subject to a documented seven-day reconciliation window.
 - Temporary integration failures must not be presented as proven user inactivity. Provide an explanation and support path; no unverified automatic backfill.
 
-### Proposed: contextual learning nudge
+### Contextual learning nudge
 
-When a user opts in and leaves an active supported learning page before meeting today's goal, offer a small, dismissible reminder to return. It should name the goal, show today's progress and the remaining amount, and show longer-term progress only when the user has set a measurable target. Actions: Continue, snooze, or dismiss. Add a short grace period and limit nudges per learning session so normal navigation does not become spam.
+When a user opts in and leaves an active supported learning page before meeting today's goal, offer a small, dismissible reminder to return. Name the goal, show today's device progress and the remaining amount, and include the user's optional motivation. An optional article milestone shows qualified articles recorded for that goal on this device; do not infer progress toward mastery or an open-ended aspiration. Actions: Continue and ten-minute Snooze buttons; closing the notification dismisses it.
 
-Trigger from leaving or switching away from the currently tracked learning activity. Do not classify arbitrary destination sites as procrastination, read general browsing history, or collect the destination URL. Use a Chrome notification/action rather than injecting UI into unrelated websites. This is an opt-in follow-up to scheduled reminders; permission and usability need validation before implementation.
+Trigger from leaving or switching away from the currently tracked learning activity after at least 30 seconds of active reading. Require at least 60 seconds away, cancel on return, and allow at most one contextual nudge in a session (sessions reset after 30 minutes without active reading). Discard away signals older than 15 minutes. Do not classify destination sites as procrastination, read general browsing history, or collect destination URLs. Use an optional Chrome notification rather than injecting into unrelated websites. Both reminder modes obey the shared daily limit and quiet hours.
+
+Daily reminders are eligible for up to 60 minutes after the chosen time in the learning timezone. Snoozes expire 15 minutes after their due time and cannot cross into another learning day. Delivery requires a currently connected active goal with a saved Continue location and notification permission. Suppress when local completion or a same-day cached cloud completion is known; cloud changes may take until the next refresh to become visible. Reserve a delivery before invoking Chrome so worker interruption cannot cause a duplicate; delivery failures can lose a reminder and are shown in Settings. No guaranteed OS display is claimed.
 
 ## 12. Out of scope
 

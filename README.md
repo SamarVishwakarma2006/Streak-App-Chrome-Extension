@@ -2,7 +2,7 @@
 
 A planned Chrome extension for daily learning goals, automatic activity tracking on supported websites, saved Continue links, milestone points, and optional reminders.
 
-**Current stage:** Step 13 — Opt-in cloud activity synchronization and separate server totals are implemented. Local SQL and mocked account/sync checks run without a hosted project. A configured Supabase development project is still required for real sign-in and cloud records; no hosted deployment has occurred.
+**Current stage:** Step 14 — Optional daily reminders and contextual learning nudges are implemented. Local reading and reminders work without an account. A configured Supabase development project is still required for real sign-in and cloud records; no hosted deployment has occurred.
 
 ## Project documents
 
@@ -23,7 +23,7 @@ Browser tracking can discourage casual skipping but cannot guarantee that activi
 
 Follow BUILD_PLAN.md one checkpoint at a time. Update DEVLOG.md with each completed checkpoint, review the diff, then commit and push the intended files. GitHub pushes and Chrome Web Store publication are separate operations.
 
-The next implementation checkpoint is **14 — Reminders and notification actions**, including the logged contextual learning nudge.
+The next implementation checkpoint is **15 — History, milestones, and interface completion**.
 
 Repository visibility and license are still undecided. No license is granted by this planning document.
 
@@ -50,7 +50,7 @@ Only supported individual free Python/DSA articles are included. Tutorial hubs, 
 
 Checks: `npm.cmd run test:reading`, `npm.cmd run test:reading:browser`, and `npm.cmd run test:smoke` (after a build). Browser checks need the installed Playwright Chromium. The reading browser test runs a real 60-second threshold on synthetic content in an isolated test package; it pre-grants only the declared optional host to avoid automating Chrome's consent dialog. Add `--live` when invoking `node scripts/reading-smoke.mjs --live` for a small public-page compatibility check.
 
-Next checkpoint: **14 — Reminders and notification actions**.
+Next checkpoint: **15 — History, milestones, and interface completion**.
 
 ## Step 09: interruption recovery
 
@@ -96,6 +96,19 @@ This step changes backend behavior only; there is no new extension screen. Actua
 cloud ingestion, pending/synced UI and offline reconciliation come in Step 13.
 Browser-tracked evidence can still be forged by a device owner; server-controlled
 awards do not make it independently verified.
+
+## Step 14: try reminders and learning nudges
+
+1. Build/reload the extension, create a goal, and connect it to GeeksforGeeks. Open a supported article once to save its Continue location.
+2. In **Settings → Remember what you’re working toward**, select the goal. Enable a daily time, a contextual nudge, or both. Optionally add your motivation and an article-count milestone.
+3. Set quiet hours and press **Save reminders**. Chrome requests the optional notification permission only when enabling a reminder. No Supabase account is needed.
+4. For a daily reminder, choose a time a minute or two ahead in the displayed learning timezone, leave the goal unfinished and stop actively reading. Chrome may deliver up to an hour late; older reminders are skipped.
+5. For a nudge, actively read for at least 30 seconds without completing the daily goal, then switch tabs or navigate away and leave Chrome focused. Wait at least a minute (the one-minute alarm can add another minute). Returning promptly cancels the nudge. Destination URLs are not inspected or stored.
+6. Choose **Continue**, **Snooze 10 minutes**, or close the notification to dismiss it. Returning to reading cancels a pending snooze. Only one automatic reminder per goal/day is allowed across both modes; explicit snooze follow-ups are the exception.
+
+Reminders skip completed, archived, disconnected or permission-blocked goals. Only the currently connected GeeksforGeeks goal is eligible, and settings remain device-only. Quiet hours, stale-session limits and delayed-alarm expiry reduce interruptions. Article milestones count qualified local articles, not mastery. Chrome closure, sleeping devices and OS settings can prevent or delay notifications.
+
+Run `npm.cmd run test:reminders` after building. The isolated browser package captures delivery calls instead of showing OS notifications. It checks timing, DST, restart/deduplication, actions, permission denial, completion suppression, real reader session binding, tab switching and destination privacy. Screenshots are saved to `test-results/reminders.png` and `test-results/reminders-narrow.png`. The real Chrome permission prompt and your operating system's presentation still require a manual check.
 
 ## Step 13: see cloud synchronization
 

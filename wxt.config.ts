@@ -14,6 +14,7 @@ export default defineConfig({
   manifest: {
     name: 'Streak Maintaining App',
     permissions: ['storage', 'tabs', 'scripting', 'alarms'],
+    optional_permissions: ['notifications'],
     ...(cloudURL ? { host_permissions: [cloudURL + '/*'] } : {}),
     optional_host_permissions: ['https://www.geeksforgeeks.org/*'],
     description: 'Development preview of your daily learning companion.',
