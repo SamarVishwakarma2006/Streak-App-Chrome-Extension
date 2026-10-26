@@ -231,6 +231,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Implement evidence/log cleanup and document actual backup retention.
 - Check: export contents, tracking stops after disconnection, repeated deletion requests, and local cleanup.
 - Suggested commit: `feat: add privacy controls and account data management`
+- Status: implemented locally on 2026-10-26. Settings supports whitelisted device/account JSON exports, confirmed device activity cleanup, account-wide provider disconnection and confirmed/idempotent account deletion. Migration 4 adds owner-only export/deletion and a restricted evidence cleanup function; retention.sql prepares daily evidence and job-log cleanup. Hosted deployment, schedule activation, production backup/log retention and normal Chrome file-save confirmation remain release checks.
 
 ## 17 — Release validation and operational preparation
 

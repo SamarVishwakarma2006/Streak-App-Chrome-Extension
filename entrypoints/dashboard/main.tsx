@@ -7,6 +7,7 @@ import { SavedGoals } from '../../src/components/SavedGoals';
 import { Account } from '../../src/components/Account';
 import { CloudProgress } from '../../src/components/CloudProgress';
 import { Reminders } from '../../src/components/Reminders';
+import { Privacy } from '../../src/components/Privacy';
 import { Connection } from '../../src/components/Connection';
 import '../../src/styles/base.css';
 
@@ -76,7 +77,7 @@ function Dashboard() {
             </section>
             <section className="gentle-note"><h3>A fresh start is still progress.</h3><p>Miss a day? Your streak restarts, but everything you’ve learned stays with you.</p></section>
           </aside>
-        </div> : section === 'connections' ? <Connection /> : section === 'settings' ? <><Reminders /><Account /><CloudProgress controls /></> : <ProgressPage key={section} rewards={section === 'rewards'} />}
+        </div> : section === 'connections' ? <Connection /> : section === 'settings' ? <><Reminders /><Account /><CloudProgress controls /><Privacy /></> : <ProgressPage key={section} rewards={section === 'rewards'} />}
         <footer className="dashboard-footer"><span>Built for progress, one day at a time.</span><span>Local resume history · Optional account sync</span></footer>
       </main>
     </div>

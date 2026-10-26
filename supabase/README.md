@@ -215,3 +215,25 @@ The extension now calls the Step 12 RPCs through its authenticated SDK session. 
 Requests contain only the event UUID, cloud goal/rule IDs, canonical article path and allowed evidence fields. Responses are reconciled by UUID; totals are freshly fetched with get_streak_summary instead of incrementing local XP from a possibly replayed response. RATE_LIMIT schedules a delayed retry, transient errors preserve the immutable request, and business rejections are shown to the user. The server receipt-date policy still applies to offline submissions.
 
 The local cloud queue is owner/generation-scoped and expires pending records after seven days. Pausing retains pending records. Sign-out warns that it discards unsynced records and clears the cloud cache, while shared device-only history remains. Hosted authentication, actual gateway behavior and concurrent-device behavior still need a development project. `npm.cmd run test:cloud` uses a fake network service; it does not deploy or prove those hosted properties.
+
+## Step 16: export, deletion and retention
+
+Apply migrations 1–4 in filename order. Migration 4 adds export_my_account(), delete_my_account(confirmation text), and private.cleanup_expired_evidence(). The export/deletion RPCs are authenticated and always derive their owner from auth.uid(); callers cannot supply a user ID. The fixed-path definer function deletes that identity and cascades application data in a single transaction. This application uses no Supabase Storage buckets. If Storage is added later, owned objects must be handled before account deletion.
+
+Deletion uses the existing authenticated session plus typed DELETE confirmation. It is safe to retry after losing the response while the original access token is still valid. If that token expires after an unconfirmed deletion, sign-in/support verification may be needed; device cleanup is still available independently. Session/identity rejection on other devices clears their account caches on the next online check. Previously issued JWTs can remain cryptographically valid until expiration; deleted identities cannot recreate profiles or ingest activity because the identity/profile foreign keys and RPC checks prevent it.
+
+Run npm run test:privacy for local SQL and browser privacy checks. SQL checks cover ownership, anonymous access denial, full rollback, repeated deletion, an old JWT, evidence expiry and duplicate replay after cleanup. PGlite mocks Auth's identity table and does not prove the hosted Auth session cascade or concurrent database connections. Verify those against a development project before release.
+
+### Evidence and job-log cleanup deployment
+
+After creating a hosted project, enable pg_cron, apply all migrations, then run retention.sql as the migration owner. It creates/updates named daily jobs at 03:17 and 03:37 UTC: raw evidence older than 30 days and cron execution metadata older than 14 days. Inspect cron.job and cron.job_run_details to confirm successful runs. Run select private.cleanup_expired_evidence(); as an administrator to check cleanup manually. Ordinary clients cannot invoke it. A normal daily schedule means evidence may remain until the first successful run after reaching 30 days; monitor failed jobs rather than advertising a strict automatic deadline.
+
+Cleanup preserves the event UUID, activity identifier, result, completion/XP records and an evidence digest for deduplication. It must not delete these while the account exists or old activities could be rewarded again. The extension records no operational request/evidence logs. Job logs contain static cleanup SQL and job status, not evidence payloads.
+
+### Current backup and provider-log status
+
+As of 2026-10-26 there is no hosted Supabase project, production backup, PITR configuration, external analytics or deployed log sink for this app. Local PGlite checks are disposable in-memory databases; ignored browser-test profiles are test fixtures. Downloads are user-controlled copies and account deletion cannot remove them.
+
+Production backup/PITR retention, hosted Auth/database/API logs and any operator-created dumps are **not configured or verified**. Before launch, record the selected project's actual settings, backup expiry and restore handling, and publish them in the privacy disclosure. Do not claim that deleting one account immediately erases it from existing backups. On restoring a backup, reapply confirmed post-backup deletions before reopening service. Keep any deletion audit process minimal and exclude raw activity or credentials.
+
+References: [Supabase user management](https://supabase.com/docs/guides/auth/managing-user-data), [Cron quickstart](https://supabase.com/docs/guides/cron/quickstart), [Database backups](https://supabase.com/docs/guides/platform/backups).

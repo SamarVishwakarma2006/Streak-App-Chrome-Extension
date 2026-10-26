@@ -1,5 +1,5 @@
 import { browser } from 'wxt/browser';
-import { authClient } from './account';
+import { authClient, forgetAccount } from './account';
 import { GFG_KEY, GFG_ORIGIN, type ReadingState } from './reading';
 import { STORE_KEY, type GoalStore } from './goals';
 import { monthDays, type CloudHistory } from './history';
@@ -32,9 +32,15 @@ export async function bindCloudArticle(localGoalId: string): Promise<CloudBindin
 async function verifiedClient(owner?: string) {
   const client = await authClient();
   const { data: session, error: sessionError } = await client.auth.getSession();
-  if (sessionError || !session.session) throw new Error('Sign in again to resume cloud sync. Saved submissions remain pending.');
+  if (sessionError || !session.session) {
+    if (!sessionError || [400, 401, 403].includes(sessionError.status ?? 0)) await forgetAccount();
+    throw new Error('Sign in again to resume cloud sync.');
+  }
   const { data, error } = await client.auth.getUser();
-  if (error || !data.user) throw new Error('Account could not be verified. Retry when online.');
+  if (error || !data.user) {
+    if ([401, 403].includes(error?.status ?? 0)) await forgetAccount();
+    throw new Error('Account could not be verified. Retry when online.');
+  }
   if (owner && data.user.id !== owner) throw new Error('This queue belongs to another account. Sign in to the original account.');
   return { client, owner: data.user.id };
 }
@@ -113,6 +119,7 @@ async function synchronize(force = false) {
     await refreshGoals(state, client);
     state.error = undefined; state.retryAt = 0;
   } catch (error) {
+    if ((await cloudState())?.generation !== state.generation) return; // Invalidated identity must not recreate its erased queue.
     state.error = error instanceof Error ? error.message : 'Cloud sync is unavailable.';
     state.retryAt = Date.now() + 60000;
   }

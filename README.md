@@ -134,3 +134,16 @@ Run npm run build, then reload the unpacked extension at chrome://extensions (lo
 - Empty dates mean no recorded completion, not proof that a disconnected user missed a task. Historical dates keep their recorded learning timezone; current stats refer to today, even while viewing an older month.
 
 Run npm run test:history after building for isolated device fixtures and calendar checks; npm run test:cloud also checks cloud history, offline errors and sign-out clearing. Test fixtures never modify your installed extension. A narrow-screen screenshot is written to test-results/history-mobile.png.
+
+## Step 16: privacy and data controls
+
+Build/reload the extension and open **Settings → Your data**.
+
+1. **Export device data** prepares a JSON download containing goal definitions, bookmarks, reading progress, prototype XP and reminder preferences. **Export account data** downloads accepted cloud records for the signed-in user. Neither includes login credentials or pending cloud evidence payloads. Exports are readable files containing private activity; importing them is not supported yet.
+2. **Clear device activity** requires typing CLEAR. It erases activity/XP, article checkpoints, saved resume bookmarks, reminders and pending submissions, disconnects tracking and keeps the goal definitions and signed-in account. Cloud records remain.
+3. Disconnect device tracking in **Connections**. **Disable account connection** also disables accepted GeeksforGeeks submissions across devices; cloud sync can explicitly enable it again later.
+4. **Delete account** requires typing DELETE. After the server confirms deletion, all local goals, activity, reminders, bookmarks, cloud caches and credentials on this browser are cleared. Downloaded exports and independent local activity on other devices are not remotely erased. Account caches on other devices clear when their invalid account/session is detected online.
+
+Cloud privacy controls require all four SQL migrations, including supabase/migrations/202610260004_privacy_controls.sql. No hosted project has been created. Follow supabase/README.md for the retention job setup and its current deployment limitations.
+
+Checks: npm run test:privacy (SQL plus isolated browser), npm run test:cloud (mocked account export/disconnect/deletion and lost-response retries). Set PLAYWRIGHT_BROWSERS_PATH as described above on this workspace. The automated browser currently cancels even plain-page JSON file persistence: the privacy check verifies the real Blob contents, filename and download initiation separately. Save/open one export in normal Chrome before release. Fixture profiles and screenshots remain under ignored test-results.

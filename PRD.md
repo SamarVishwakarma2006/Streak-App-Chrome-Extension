@@ -156,7 +156,7 @@ A completion explanation should say, for example, “18 of 20 minutes played; 90
 - Do not collect passwords, screenshots, keystrokes, or arbitrary page contents.
 - Export excludes authentication credentials and platform tokens.
 - Uninstalling removes local extension data; it does not automatically delete the cloud account.
-- Account deletion removes active cloud records and clears local data on the requesting device. Other signed-in devices clear account data on their next authenticated connection. Backup retention must be documented before launch.
+- Account deletion removes active cloud records and clears local data on the requesting device. Other signed-in devices clear account credentials/caches when an invalid account or session is detected online; their independent device-only activity is not remotely erased. Backup retention must be documented before launch.
 
 Authentication credentials are separate from activity history. An account-based product necessarily handles its own login session and may hold authorized platform tokens on the server.
 
@@ -226,3 +226,7 @@ This file owns product behavior. ARCHITECTURE.md owns implementation structure. 
 ### Step 05 prototype scope
 
 Before integration discovery, users may explicitly approve a site and save a manual HTTPS lesson bookmark. This is separate from a connected provider and carries no tracking claim. The production provider-only Continue rule above applies to automated adapter resume targets. The prototype strips query strings/fragments and does not yet restore playback positions, verify page availability, or support query-dependent lesson identifiers.
+
+## Step 16 delivery note (2026-10-26)
+
+Settings now offers device/account JSON exports, typed confirmation for device activity cleanup and account deletion, and account-wide GeeksforGeeks disconnection. Device cleanup preserves goal definitions and cloud records; confirmed account deletion clears all local goals and activity on the requesting device. Exports omit authentication credentials and queued evidence. Migration 4 and the retention schedule are prepared locally. Hosted deletion/session verification, activated retention jobs, actual production backup/provider-log retention and normal Chrome file saving remain release checks.

@@ -58,6 +58,10 @@ button, a { transition: background-color 150ms ease, border-color 150ms ease; }
 .button-outline:hover { background: #eef4e9; border-color: #96b79d; }
 .button-quiet { border-color: transparent; color: #3f674e; background: #eff5ed; }
 .button-quiet:hover { background: #dfeadb; }
+.danger-button { color: #87351f; border-color: #c99280; }
+.danger-button:not(.button-outline) { background: #87351f; color: white; }
+.danger-button:hover { background: #f7e9e2; color: #6e2918; }
+.privacy-controls a { text-underline-offset: 3px; }
 .app-layout { display: grid; grid-template-columns: 224px minmax(0, 1fr); min-height: 100vh; }
 .sidebar { position: sticky; top: 0; height: 100vh; padding: 30px 20px; display: flex; flex-direction: column; background: #f0f3eb; border-right: 1px solid var(--line); }
 .sidebar .brand { margin: 0 8px 48px; }

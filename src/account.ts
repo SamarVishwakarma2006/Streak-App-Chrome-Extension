@@ -11,6 +11,11 @@ async function clearCaches() {
   const saved = await browser.storage.local.get(null);
   await browser.storage.local.remove(Object.keys(saved).filter(k => k.startsWith(cachePrefix) || k === `cloud:${url ?? 'unconfigured'}`));
 }
+export async function forgetAccount() {
+  await browser.storage.local.remove(storageKey);
+  await clearCaches();
+  client = undefined;
+}
 export async function authClient() {
   if (!url || !key) throw new Error('Cloud setup is not configured in this build.');
   // Content scripts must never be able to read persisted refresh tokens.
@@ -33,9 +38,7 @@ export async function handleAccount(action: string, payload: any, goals: GoalSto
     let revoked = false;
     try { revoked = !(await supabase.auth.signOut({ scope: 'local' })).error; } catch { revoked = false; }
     finally {
-      await browser.storage.local.remove(storageKey);
-      await clearCaches();
-      client = undefined;
+      await forgetAccount();
     }
     return { configured: true, user: null, message: revoked ? 'Signed out. Unsynced cloud submissions were discarded; device-only goals remain on this browser.' : 'Signed out on this device; unsynced cloud submissions were discarded. Server revocation could not be confirmed while offline; existing access tokens may remain valid until expiry.' };
   }
@@ -57,10 +60,16 @@ export async function handleAccount(action: string, payload: any, goals: GoalSto
   }
   // getSession refreshes expired sessions; getUser verifies the identity remotely.
   const { data: session, error: sessionError } = await supabase.auth.getSession();
-  if (sessionError) throw new Error('Session refresh failed. Retry when online or sign out to start again.');
+  if (sessionError) {
+    if ([400, 401, 403].includes(sessionError.status ?? 0)) { await forgetAccount(); return { configured: true, user: null, message: 'This session is no longer valid. Account data was cleared from this browser.' }; }
+    throw new Error('Session refresh failed. Retry when online or sign out to start again.');
+  }
   if (!session.session) { await clearCaches(); return { configured: true, user: null }; }
   const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) throw new Error('Could not verify your account. Reconnect and retry, or sign out.');
+  if (error || !data.user) {
+    if ([401, 403].includes(error?.status ?? 0)) { await forgetAccount(); return { configured: true, user: null, message: 'This account is no longer available. Account data was cleared from this browser.' }; }
+    throw new Error('Could not verify your account. Reconnect and retry, or sign out.');
+  }
   const user = { id: data.user.id, email: data.user.email ?? '' };
   const accountKey = cachePrefix + user.id;
   const saved = await browser.storage.local.get(null);

@@ -24,7 +24,8 @@
     "test:streaks": "node scripts/streaks.mjs",
     "test:smoke": "node scripts/smoke.mjs",
     "postinstall": "wxt prepare",
-    "test:history": "node scripts/history.mjs"
+    "test:history": "node scripts/history.mjs",
+    "test:privacy": "node scripts/privacy-database.mjs && node scripts/privacy.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.118.0",

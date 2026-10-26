@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
 
 // Real PostgreSQL SQL/RLS, with only Supabase's roles and Auth identity shimmed.
@@ -17,9 +17,8 @@ try {
     grant usage on schema auth, public to anon, authenticated, service_role;
     grant execute on function auth.uid() to anon, authenticated, service_role;
     insert into auth.users values ('${a}'), ('${b}');`);
-  await db.exec(await readFile(new URL('../supabase/migrations/202610250001_initial_schema.sql', import.meta.url), 'utf8'));
-  await db.exec(await readFile(new URL('../supabase/migrations/202610250002_account_goals.sql', import.meta.url), 'utf8'));
-  await db.exec(await readFile(new URL('../supabase/migrations/202610250003_completion_validation.sql', import.meta.url), 'utf8'));
+  const folder = new URL('../supabase/migrations/', import.meta.url);
+  for (const file of (await readdir(folder)).filter(f => f.endsWith('.sql')).sort()) await db.exec(await readFile(new URL(file, folder), 'utf8'));
   await db.exec(`set role service_role; insert into public.profiles(user_id) values ('${a}'), ('${b}');`);
   const rows = {};
   for (const owner of [a, b]) {

@@ -37,10 +37,16 @@ async function mock() {
         const token = btoa('{}') + '.' + btoa(JSON.stringify({ sub: user(body.email).id, exp: Math.floor(Date.now() / 1000) + 3600 })) + '.fixture';
         result = { access_token: token, refresh_token: 'fixture', expires_in: 3600, token_type: 'bearer', user: user(body.email) };
       } else if (url.includes('/user')) {
+        if (globalThis.deleted) return new Response(JSON.stringify({message:'User deleted'}),{status:401,headers:{'Content-Type':'application/json'}});
         const sub = JSON.parse(atob(new Headers(init.headers).get('authorization').split('.')[1])).sub;
         result = user(sub === accountId ? 'one@example.com' : 'two@example.com');
       } else if (url.includes('/streaks')) result = [{ id: goalId, local_goal_id: globalThis.localId, name: 'Cloud reading', status: 'active' }];
       else if (url.includes('/get_streak_summary')) result = summary;
+      else if (url.includes('/export_my_account')) result = {streaks:[{id:goalId,name:'Cloud reading'}],completions:[{local_date:'2026-10-26'}],points:[{amount:25}]};
+      else if (url.includes('/delete_my_account')) {
+        if (globalThis.mode === 'delete-lost') { globalThis.deleted = true; throw new TypeError('Lost deletion response'); }
+        globalThis.deleted = true; result = {deleted:true};
+      }
       else if (url.includes('/daily_completions')) result = [{local_date:'2026-10-25'},{local_date:'2026-10-26'}];
       else if (url.includes('/milestone_awards')) result = [{milestone:3}];
       else if (url.includes('/submit_reading_event')) {
@@ -101,6 +107,13 @@ try {
     return result.result;
   }, articleURL);
   assert.equal(denied, true, 'Content scripts cannot read or enable cloud synchronization');
+  const privacyDenied = await worker.evaluate(async url => {
+    const [tab] = await chrome.tabs.query({ url });
+    const [result] = await chrome.scripting.executeScript({ target:{tabId:tab.id}, func:async()=> {
+      try { return !(await chrome.runtime.sendMessage({type:'privacy',action:'clear-device',payload:{confirmation:'CLEAR'}}))?.ok; } catch { return true; }
+    }}); return result.result;
+  }, articleURL);
+  assert.equal(privacyDenied,true,'Websites cannot export or erase private data');
   await website.close();
   const offlineId = await addArticle('offline-article', 86400000);
   await worker.evaluate(() => { globalThis.mode = 'offline'; });
@@ -170,5 +183,32 @@ try {
   await request('cloud', 'enable'); await request('cloud', 'retry');
   assert.equal((await read()).events.length, 0, 'Another account cannot inherit old article bindings');
   assert.equal((await submissions()).length, count);
+  const exported = await request('privacy','export-account');
+  assert.equal(exported.ok,true); assert.equal(exported.document.account.id,'22222222-2222-4222-8222-222222222222');
+  assert.equal(exported.document.records.points[0].amount,25);
+  assert.ok(!JSON.stringify(exported.document).includes('access_token'));
+  assert.equal((await request('privacy','disconnect-account')).ok,true);
+  assert.equal((await read()).enabled,false);
+  assert.ok((await worker.evaluate(()=>globalThis.calls)).some(c=>c.url.includes('/set_reading_connection') && c.body.p_connected===false));
+  await worker.evaluate(()=>{globalThis.deleted=true;});
+  await request('cloud','retry');
+  assert.equal(await read(),undefined,'Invalidated sync cannot resurrect its erased queue');
+  assert.equal((await request('account','read')).user,null);
+  assert.equal(await read(),undefined,'A remotely deleted identity clears cached account data on its next online check');
+  assert.ok((await page.evaluate(()=>chrome.storage.local.get('gfgReading'))).gfgReading.articles,'Device activity remains independent');
+  await worker.evaluate(()=>{globalThis.deleted=false;});
+  await request('account','verify',{email:'two@example.com',code:'123456'});
+  await request('cloud','enable');
+  assert.equal((await request('privacy','delete-account',{confirmation:'wrong'})).ok,false);
+  await worker.evaluate(()=>{globalThis.mode='delete-lost';});
+  assert.equal((await request('privacy','delete-account',{confirmation:'DELETE'})).ok,false);
+  assert.ok(await read(),'Keep local queue until deletion is confirmed');
+  await worker.evaluate(()=>{globalThis.mode='normal';});
+  assert.equal((await request('privacy','delete-account',{confirmation:'DELETE'})).ok,true,'Retry works after remote identity is already deleted');
+  const erased = await page.evaluate(()=>chrome.storage.local.get(null));
+  assert.ok(!Object.keys(erased).some(k=>k.startsWith('auth:') || k.startsWith('account:') || k.startsWith('cloud:')));
+  assert.equal(erased.gfgReading.goalId,null); assert.deepEqual(erased.gfgReading.articles,{});
+  assert.equal(erased.goalStore.goals.length,0);
+  console.log('PASS: account privacy export, global disconnection, website denial, lost deletion response/retry and local credential/activity cleanup.');
   console.log('PASS: cloud opt-in/binding, no history import, offline browser restart, receipt day, immutable replay, authoritative totals, expiry, rejection, rate delay, pause, sign-out and account isolation. Mocked service only.');
 } finally { await context.close(); }

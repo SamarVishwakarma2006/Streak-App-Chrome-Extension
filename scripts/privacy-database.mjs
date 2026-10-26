@@ -1,0 +1,67 @@
+import assert from 'node:assert/strict';
+import { readFile, readdir } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+import { PGlite } from '@electric-sql/pglite';
+const db = new PGlite();
+const owner = randomUUID(), other = randomUUID();
+const sql = async (text, args = []) => (await db.query(text, args)).rows;
+const as = async id => { await db.exec('set role authenticated'); await sql("select set_config('request.jwt.claim.sub',$1,false)", [id]); };
+const denied = async (query, args = []) => assert.rejects(() => sql(query, args));
+try {
+  await db.exec(`create role anon; create role authenticated; create role service_role bypassrls; create schema auth;
+    create table auth.users(id uuid primary key);
+    create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
+    grant usage on schema public,auth to anon,authenticated,service_role;
+    grant execute on function auth.uid() to anon,authenticated,service_role;
+    insert into auth.users values('${owner}'),('${other}');`);
+  const folder = new URL('../supabase/migrations/', import.meta.url);
+  for (const file of (await readdir(folder)).filter(f => f.endsWith('.sql')).sort()) await db.exec(await readFile(new URL(file, folder), 'utf8'));
+  for (const id of [owner, other]) {
+    await as(id);
+    assert.deepEqual((await sql('select public.export_my_account() as doc'))[0].doc.streaks, []);
+    await sql('select public.copy_goal_definitions($1,$2)', [[{ local_id: randomUUID(), name: `Goal ${id}`, target: 1, unit: 'lessons' }], 'UTC']);
+    await db.exec('select public.set_reading_connection(true)');
+  }
+  await as(owner);
+  const goal = (await sql('select s.id, r.id as rule from public.streaks s join public.streak_rule_versions r on s.id=r.streak_id'))[0];
+  const event = randomUUID(), activity = '/python/privacy-article/';
+  const evidence = { schema_version: 1, fingerprint: 'a'.repeat(64), weights: [40,40,20], dwell: [12,12,6], active_seconds: 60 };
+  const submit = e => sql('select public.submit_reading_event($1,$2,$3,$4,$5) as result', [event, goal.id, goal.rule, activity, e]).then(r => r[0].result);
+  const accepted = await submit(evidence); assert.equal(accepted.status, 'accepted');
+  const document = (await sql('select public.export_my_account() as doc'))[0].doc;
+  assert.equal(document.streaks.length, 1); assert.equal(document.events.length, 1); assert.equal(document.points[0].amount, 25);
+  assert.ok(!JSON.stringify(document).includes(other));
+  await denied('select private.cleanup_expired_evidence()');
+  await db.exec('reset role');
+  await sql("update public.activity_events set received_at=clock_timestamp()-interval '31 days' where event_uuid=$1", [event]);
+  await sql("update private.ingestion_limits set window_start=clock_timestamp()-interval '2 days'");
+  await db.exec('set role service_role');
+  assert.equal((await sql('select private.cleanup_expired_evidence() as n'))[0].n, 1);
+  assert.equal((await sql('select private.cleanup_expired_evidence() as n'))[0].n, 0);
+  await as(owner);
+  const cleaned = (await sql('select public.export_my_account() as doc'))[0].doc;
+  assert.deepEqual(cleaned.events[0].evidence, {});
+  assert.equal(cleaned.completions.length, 1); assert.equal(cleaned.points[0].amount, 25);
+  assert.deepEqual(await submit(evidence), { ...accepted, replayed: true });
+  assert.equal((await submit({ ...evidence, active_seconds: 61 })).code, 'EVENT_CONFLICT');
+  await denied("select public.delete_my_account('wrong')");
+  assert.equal((await sql('select * from public.streaks')).length, 1);
+  // Any failure rolls back the entire deletion, including dependent rows.
+  await db.exec(`reset role; create function auth.fail_delete() returns trigger language plpgsql as $$ begin raise exception 'fixture'; end $$;
+    create trigger fail_delete before delete on auth.users for each row execute function auth.fail_delete();`);
+  await as(owner); await denied("select public.delete_my_account('DELETE')");
+  assert.equal((await sql('select * from public.daily_completions')).length, 1);
+  await db.exec('reset role; drop trigger fail_delete on auth.users;');
+  await as(owner);
+  assert.equal((await sql("select public.delete_my_account('DELETE') as result"))[0].result.deleted, true);
+  assert.equal((await sql("select public.delete_my_account('DELETE') as result"))[0].result.deleted, true);
+  for (const table of ['profiles','streaks','streak_rule_versions','streak_runs','provider_connections','activity_events','provider_activity_credits','daily_completions','points_ledger','milestone_awards']) assert.equal((await sql(`select * from public.${table}`)).length, 0, table);
+  await denied('select public.export_my_account()');
+  await denied('select public.copy_goal_definitions($1,$2)', [[], 'UTC']);
+  assert.equal((await submit(evidence)).code, 'PROFILE_MISSING', 'Deleted identity cannot ingest with an unexpired JWT');
+  await as(other); assert.equal((await sql('select public.export_my_account() as doc'))[0].doc.streaks.length, 1);
+  await db.exec('set role anon');
+  await denied('select public.export_my_account()'); await denied("select public.delete_my_account('DELETE')");
+  await as(''); await denied('select public.export_my_account()'); await denied("select public.delete_my_account('DELETE')");
+  console.log('Privacy SQL: owner-only export, evidence expiry/replay, denied cleanup access, confirmed/idempotent/atomic deletion, stale-JWT ingestion denial and other-account preservation passed.');
+} finally { await db.close(); }

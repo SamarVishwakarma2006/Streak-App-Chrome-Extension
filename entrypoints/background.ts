@@ -2,6 +2,7 @@ import { handleReading, syncReadingGoal, continueGoal, recoverAwards } from '../
 import { handleReminders, ensureReminderAlarm, reminderTick, observeReading, leftReading, notificationAction, REMINDER_ALARM } from '../src/reminders';
 import { handleAccount } from '../src/account';
 import { handleCloud, syncCloud, withCloudLock } from '../src/cloud';
+import { handlePrivacy } from '../src/privacy';
 import { GFG_KEY } from '../src/reading';
 import { browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
@@ -40,12 +41,13 @@ export default defineBackground(() => {
   }); });
   browser.tabs.onRemoved.addListener(id => { void browser.storage.session.remove(`gfg-resume:${id}`); reminderJob(() => leftReading(id, true)); });
   browser.runtime.onMessage.addListener((message, sender) => {
-    if (!['goals', 'gfg', 'account', 'cloud', 'reminders'].includes(message?.type)) return;
+    if (!['goals', 'gfg', 'account', 'cloud', 'reminders', 'privacy'].includes(message?.type)) return;
     if (sender.id !== browser.runtime.id) return;
-    if (['goals', 'account', 'cloud', 'reminders'].includes(message.type) && !sender.url?.startsWith(browser.runtime.getURL('/'))) return;
+    if (['goals', 'account', 'cloud', 'reminders', 'privacy'].includes(message.type) && !sender.url?.startsWith(browser.runtime.getURL('/'))) return;
     // Cloud networking must not hold up one-second reading checkpoints.
     if (message.type === 'cloud') return withCloudLock(async () => ({ ok: true, state: await handleCloud(message.action, message.payload) })).catch(e => ({ ok: false, error: e instanceof Error ? e.message : 'Cloud sync unavailable.' }));
     const operation = queue.then(async () => {
+      if (message.type === 'privacy') return withCloudLock(async () => ({ ok: true, ...await handlePrivacy(message.action, message.payload) }));
       const saved = await browser.storage.local.get(STORE_KEY);
       const store = migrateGoals(saved[STORE_KEY]);
       const { action, payload } = message;

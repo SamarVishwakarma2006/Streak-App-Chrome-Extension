@@ -4,6 +4,7 @@ import { newLedger, addGoal, archiveGoal, changeRule, complete, localDate, progr
 import type { Goal, GoalStore } from './goals';
 import { bindCloudArticle } from './cloud';
 const baselines = new Map<number, { at: number; url: string; fingerprint: string; goalId: string }>();
+export function resetReadingBaselines() { baselines.clear(); }
 
 export async function readingState(): Promise<ReadingState> {
   const value = (await browser.storage.local.get(GFG_KEY))[GFG_KEY] as ReadingState | undefined;
@@ -99,7 +100,7 @@ export async function handleReading(action: string, payload: any, sender: Browse
   let article = state.articles[key];
   if (article && article.goalId !== goal.id) return { status: 'This article belongs to another goal. Choose a new article.' };
   if (!article || (!article.completed && article.fingerprint !== payload.fingerprint)) {
-    if (!article && Object.keys(state.articles).length >= 200) throw new Error('Local article limit reached. Data management will be added before release.');
+    if (!article && Object.keys(state.articles).length >= 200) throw new Error('Local article limit reached. Export and clear device activity in Settings to start fresh.');
     article = { url, title: payload.title, fingerprint: payload.fingerprint, weights: payload.weights, dwell: payload.weights.map(() => 0), seconds: 0, byDate: {}, goalId: goal.id, completed: false, chunk: 0 } as Article;
     article.cloud = await bindCloudArticle(goal.id);
     state.articles[key] = article; baselines.delete(tabId);
