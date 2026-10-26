@@ -33,6 +33,18 @@ try {
   assert.equal(document.goals[0].name,'Private reading'); assert.equal(document.reading.articles[0].seconds,60);
   assert.equal(document.reminders.goals[created.store.goals[0].id].motivation,'Learn a little');
   for (const secret of ['AUTH_SECRET','CACHE_SECRET','EVIDENCE_SECRET','OUTBOX_SECRET','PENDING_SECRET']) assert.ok(!text.includes(secret),secret);
+  const [diagnosticDownload] = await Promise.all([page.waitForEvent('download'),page.getByRole('button',{name:'Export beta diagnostics',exact:true}).click()]);
+  const diagnosticFailure=await diagnosticDownload.failure();
+  if(diagnosticFailure) assert.equal(diagnosticFailure,'canceled');
+  const diagnosticText=diagnosticFailure ? await page.evaluate(url=>fetch(url).then(r=>r.text()),diagnosticDownload.url()) : await readFile(await diagnosticDownload.path(),'utf8');
+  const summary=JSON.parse(diagnosticText);
+  assert.match(diagnosticDownload.suggestedFilename(),/^streak-diagnostics-.*\.json$/);
+  assert.equal(summary.reportType,'beta-technical-summary'); assert.equal(summary.goals.active,1);
+  assert.equal(summary.reading.qualifiedArticles,1); assert.equal(summary.cloud.pending,1);
+  assert.equal(summary.reminders.enabledGoals,1);
+  for(const privateValue of ['AUTH_SECRET','CACHE_SECRET','EVIDENCE_SECRET','OUTBOX_SECRET','PENDING_SECRET','Private reading','Resume lesson','Learn a little','geeksforgeeks.org',created.store.goals[0].id]) assert.ok(!diagnosticText.includes(privateValue),privateValue);
+  assert.deepEqual(Object.keys(summary).sort(),['schemaVersion','reportType','appVersion','cloudConfigured','permissions','goals','reading','cloud','reminders'].sort());
+  await page.getByRole('status').filter({hasText:'Nothing was sent automatically.'}).waitFor();
   assert.equal((await request('clear-device',{confirmation:'wrong'})).ok,false);
   await page.getByRole('button',{name:'Clear device activity',exact:true}).click();
   assert.equal(await page.getByRole('button',{name:'Clear permanently'}).isDisabled(),true);

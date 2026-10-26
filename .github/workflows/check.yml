@@ -22,6 +22,8 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run check
+      - name: Prepare beta bundle and store drafts
+        run: node scripts/store.mjs
       - name: Upload check results
         if: always()
         uses: actions/upload-artifact@v5
@@ -38,4 +40,6 @@ jobs:
           path: |
             .output/*-chrome.zip
             .output/release-sha256.txt
+            .output/beta-*/
+            .output/store-draft-*/
           retention-days: 7

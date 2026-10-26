@@ -47,6 +47,24 @@ async function clearDevice(deleteGoals = false) {
   await browser.storage.session.remove(Object.keys(session).filter(k => k === 'reminderSession' || k.startsWith('gfg-resume:')));
 }
 export async function handlePrivacy(action: string, payload: any) {
+  if (action === 'export-diagnostics') {
+    const saved = await browser.storage.local.get([STORE_KEY, GFG_KEY, REMINDER_KEY, CLOUD_KEY]);
+    const store = saved[STORE_KEY] as { goals?: { archived?: boolean }[] } | undefined;
+    const reading = saved[GFG_KEY] as { goalId?: string; articles?: Record<string, { completed?: boolean }>; pending?: unknown[] } | undefined;
+    const cloud = saved[CLOUD_KEY] as { enabled?: boolean; events?: { status?: string }[] } | undefined;
+    const reminders = saved[REMINDER_KEY] as { goals?: Record<string, { daily?: boolean; nudge?: boolean }> } | undefined;
+    const goals = Array.isArray(store?.goals) ? store.goals : [];
+    const articles = Object.values(reading?.articles ?? {});
+    const events = Array.isArray(cloud?.events) ? cloud.events : [];
+    return { document: { schemaVersion: 1, reportType: 'beta-technical-summary', appVersion: browser.runtime.getManifest().version,
+      cloudConfigured: !!import.meta.env.WXT_SUPABASE_URL,
+      permissions: { site: await browser.permissions.contains({ origins: [GFG_ORIGIN] }), notifications: await browser.permissions.contains({ permissions: ['notifications'] }) },
+      goals: { active: goals.filter(g => g?.archived === false).length, archived: goals.filter(g => g?.archived === true).length },
+      reading: { connected: typeof reading?.goalId === 'string' && !!reading.goalId, trackedArticles: articles.length, qualifiedArticles: articles.filter(a => a?.completed === true).length, pendingAwards: Array.isArray(reading?.pending) ? reading.pending.length : 0 },
+      cloud: { enabled: cloud?.enabled === true, pending: events.filter(e => e?.status === 'pending').length, rejected: events.filter(e => e?.status === 'rejected').length, expired: events.filter(e => e?.status === 'expired').length },
+      reminders: { enabledGoals: Object.values(reminders?.goals ?? {}).filter(p => p?.daily === true || p?.nudge === true).length },
+    } };
+  }
   if (action === 'export-device') return { document: deviceExport(await browser.storage.local.get([STORE_KEY, GFG_KEY, REMINDER_KEY])) };
   if (action === 'clear-device') {
     if (payload?.confirmation !== 'CLEAR') throw new Error('Type CLEAR to erase device activity.');

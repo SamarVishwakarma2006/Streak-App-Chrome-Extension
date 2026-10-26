@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "state": "local-draft-preparation",
+  "submitted": false,
+  "approved": false,
+  "published": false,
+  "storeItemId": null,
+  "submittedAt": null,
+  "approvedAt": null,
+  "publishedAt": null,
+  "blockers": [
+    "Final publisher/product identity and monitored support contact",
+    "Publicly hosted completed privacy policy and support URLs",
+    "Configured production Auth/SMTP and verified hosted acceptance checks",
+    "Verified production retention, backup/restore and budget/alert settings",
+    "Actual participant beta setup/completion and unresolved failure review",
+    "Final release UI and recaptured package-matched screenshots",
+    "Developer account, dashboard disclosures and private reviewer access procedure",
+    "Clean committed-source candidate and explicit owner submission authorization"
+  ]
+}

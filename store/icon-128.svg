@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Large/store optical variant: existing mark at 96px with 16px transparent padding. -->
+  <g transform="translate(16 16) scale(.75)">
+    <rect width="128" height="128" rx="30" fill="#194f3f"/>
+    <path d="M28 84V70M52 84V54M76 84V38" fill="none" stroke="#e6f4cf" stroke-width="12" stroke-linecap="round"/>
+    <circle cx="100" cy="38" r="7" fill="#f5b17d"/>
+  </g>
+</svg>

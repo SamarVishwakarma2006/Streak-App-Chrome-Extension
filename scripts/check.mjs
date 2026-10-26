@@ -3,7 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 // Run sequentially: account/cloud tests temporarily rebuild the shared output directory.
-const checks = ['typecheck', 'test:config', 'test:reading', 'test:streaks', 'test:database', 'test:ingestion', 'build', 'test:smoke', 'test:reading:browser', 'test:recovery', 'test:account', 'test:cloud', 'test:reminders', 'test:history', 'test:privacy', 'zip', 'test:release'];
+const checks = ['typecheck', 'test:beta', 'test:config', 'test:reading', 'test:streaks', 'test:database', 'test:ingestion', 'build', 'test:smoke', 'test:reading:browser', 'test:recovery', 'test:account', 'test:cloud', 'test:reminders', 'test:history', 'test:privacy', 'zip', 'test:release'];
 if (!process.env.npm_execpath) throw new Error('Run this with npm run check.');
 const git = spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' });
 const dirty = spawnSync('git', ['status', '--porcelain'], { encoding: 'utf8' });

@@ -47,8 +47,8 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   await page.screenshot({ path: 'test-results/history-mobile.png', fullPage: true });
   await page.getByRole('navigation').getByRole('link', { name: 'Rewards' }).click();
-  assert.equal(await page.locator('.reward-card.earned').count(), 1);
   await page.locator('.reward-card.earned').getByRole('heading', { name: '3 days' }).waitFor();
+  assert.equal(await page.locator('.reward-card.earned').count(), 1);
   await page.getByLabel('Progress source').selectOption('cloud');
   await page.getByRole('alert').filter({ hasText: 'Cloud setup is not configured' }).waitFor();
   await page.getByRole('button', { name: 'Refresh history' }).focus();

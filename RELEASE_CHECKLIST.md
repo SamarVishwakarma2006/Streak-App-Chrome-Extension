@@ -1,7 +1,9 @@
 # Release readiness — Step 17
 
 Current decision: **local release preparation passed on 2026-10-26; public launch is not approved**.
-All 17 local gate stages passed. The report is in test-results/release-checks.json;
+All 18 local gate stages passed for the current candidate, including beta packaging
+checks. Store asset generation/dimension/hash checks also passed separately.
+The current report is in test-results/release-checks.json;
 CI on GitHub and the hosted/manual checks below are still pending.
 There is no deployed Supabase project, production SMTP setup, store submission or
 verified production backup policy. This file records evidence, not a claim that
@@ -40,7 +42,7 @@ or a complete comparison against an old released binary.
 
 The GitHub workflow runs the same command for pull requests and pushes to main.
 It needs no account secrets and has read-only repository permission. It uploads
-only the check report and checked development ZIP/checksum, with seven-day artifact
+only the check report, checked development ZIP/checksum and allowlisted beta/store draft bundles, with seven-day artifact
 retention. Browser profiles, exports and screenshots are not uploaded. The first
 remote workflow run is pending until this change is pushed.
 
@@ -127,3 +129,11 @@ sandbox. No account or cloud completion was involved.
 The release review follows [Supabase's production checklist](https://supabase.com/docs/guides/deployment/going-into-prod)
 and [Playwright's CI guidance](https://playwright.dev/docs/ci). Local passing checks
 are necessary evidence; the unresolved hosted and user-facing checks remain gates.
+
+## Beta handoff
+
+npm run beta re-runs the complete local gate and builds a new .output/beta-VERSION-TIMESTAMP folder. Read BETA_START_HERE.md, BETA_LIMITATIONS.md and BETA_FEEDBACK.md before sharing it. BUILD_INFO.json records the checked revision, dirty status, ZIP hash and cloud mode; it explicitly leaves participant testing and public launch unapproved. The technical diagnostic download remains user-initiated and manual. Real participant observations and native export saving are still required; a generated bundle is not beta feedback.
+
+## Store review preparation
+
+npm run store:prepare creates a checked draft review folder after the local gate, with the ZIP/hash/source metadata, listing/policy/disclosure/reviewer text, icon and three 1280×800 actual-UI screenshots containing labeled sample records. See store/README.md and store/STATUS.json. All store states remain false; public publisher/policy/support setup, hosted/beta/native checks and final release captures remain blockers. No submission or publication is implied by generating these files.

@@ -15,10 +15,10 @@ export function Privacy() {
       if (result.document) {
         const url = URL.createObjectURL(new Blob([JSON.stringify(result.document, null, 2)], { type: 'application/json' }));
         const link = document.createElement('a'); link.href = url;
-        link.download = `streak-${action === 'export-device' ? 'device' : 'account'}-${new Date().toISOString().slice(0, 10)}.json`;
+        link.download = `streak-${action === 'export-diagnostics' ? 'diagnostics' : action === 'export-device' ? 'device' : 'account'}-${new Date().toISOString().slice(0, 10)}.json`;
         document.body.append(link); link.click(); link.remove();
         setTimeout(() => URL.revokeObjectURL(url), 60000);
-        setNotice('Export prepared. Check your downloads. Keep it private: it contains your goals and activity. Exports cannot be imported yet.');
+        setNotice(action === 'export-diagnostics' ? 'Technical report prepared. Review the file before sharing it. Nothing was sent automatically.' : 'Export prepared. Check your downloads. Keep it private: it contains your goals and activity. Exports cannot be imported yet.');
       } else setNotice(result.message ?? 'Done.');
       dialog.current?.close();
     } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
@@ -28,6 +28,8 @@ export function Privacy() {
     <p className="eyebrow">YOUR DATA</p><h2>Keep what matters. Clear what you choose.</h2>
     <p>Device exports include goal definitions, bookmarks, reading progress, local XP and reminder preferences. Account exports include your profile and cloud activity. Credentials and pending submission payloads are excluded.</p>
     <div className="goal-actions"><button className="button button-outline" disabled={busy} onClick={() => void run('export-device')}>Export device data</button><button className="button button-outline" disabled={busy} onClick={() => void run('export-account')}>Export account data</button></div>
+    <p>Testing the beta? Export a technical report with the app version, permission states and counts. It excludes goal names, lesson links, account details and reading evidence. Review it before sharing feedback; nothing is sent automatically.</p>
+    <button className="button button-outline" disabled={busy} onClick={() => void run('export-diagnostics')}>Export beta diagnostics</button>
     <p>Disconnect device tracking in <a href="#connections">Connections</a>. To stop accepted GeeksforGeeks submissions from all devices, disable the account connection below. It can be enabled again in Cloud sync.</p>
     <button className="button button-outline" disabled={busy} onClick={() => void run('disconnect-account')}>Disable account connection</button>
     <p>Clearing device activity removes local streaks, XP, article checkpoints, bookmarks, reminders and unsynced submissions. It disconnects tracking and keeps goal definitions and cloud records.</p>

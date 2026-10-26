@@ -234,3 +234,11 @@ Settings now offers device/account JSON exports, typed confirmation for device a
 ## Step 17 delivery note (2026-10-26)
 
 RELEASE_CHECKLIST.md maps release acceptance criteria to local evidence and remaining hosted/manual checks. A repeatable sequential gate and GitHub Actions workflow use fictional accounts; a packaged version-change fixture checks device persistence. The server operator can pause new GeeksforGeeks cloud acceptance without deleting saved pending submissions. Production SMTP, actual multi-connection/JWT behavior, billing alerts, retention/restore policy and store checks remain external release gates. Video tracking remains unsupported.
+
+## Step 18 delivery note (2026-10-26)
+
+Private beta preparation includes a checked installable bundle, user instructions, known limits and a blank feedback/aggregate tally template. A manually exported technical report contains version, permission flags and counts only; it is not sent automatically. No telemetry SDK, identifying feedback records or participant results are added. Observed real-user setup/completion, voluntary weekly follow-up and beta exit approval are still pending. Public launch remains gated by hosted/manual validation and Step 19.
+
+## Step 19 preparation note (2026-10-26)
+
+Store review drafts and reproducible working-brand icon/sample-data screenshots are prepared locally. Listing and privacy disclosures describe relevant article URLs/content/activity, optional cloud data and Browser tracked limitations. A record of draft preparation is separate from submission, approval and publication; all three store states remain false. Public policy/support information, hosted validation, actual beta observations and final release UI captures still require completion before any authorized submission.

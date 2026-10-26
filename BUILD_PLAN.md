@@ -255,7 +255,8 @@ You control GitHub publishing. These documents do not record a successful push u
 - Resolve actual setup/tracking failures in separately logged fixes.
 - Record feedback without identifying users or publishing their activity.
 - Check: observe a fresh setup and real completion on the supported site.
-- Suggested commit: `docs: prepare beta package instructions and feedback plan`
+- Suggested commit: `feat: prepare beta package and feedback tools`
+- Status: beta preparation implemented on 2026-10-26. Checked ZIP/checksum bundle generation, installation/use/limitations documents, voluntary feedback and aggregate tally templates, and manual technical diagnostics are prepared. No automatic telemetry or feedback transmission is added. Participant recruitment, observed fresh setup and real article completion, follow-up feedback and beta exit approval remain pending.
 - Actual beta results require real participants; do not mark them complete from internal testing.
 
 ## 19 — Chrome Web Store submission and launch
@@ -268,7 +269,8 @@ You control GitHub publishing. These documents do not record a successful push u
 - Submit through the developer account when authorized.
 - Record submitted, approved, and published as separate states.
 - Check: store installation and first-use flow after publication.
-- Suggested commit: `release: prepare first Chrome Web Store release`
+- Suggested commit: `release: prepare Chrome Web Store review drafts`
+- Status: local store preparation on 2026-10-26. Draft listing, policy/disclosure mapping, reviewer instructions, release notes, working-brand icon and real-UI/sample-data screenshot generation are prepared. The review folder records source/package/image hashes and explicit false submission/approval/publication states. Publisher/contact/public URLs, real beta feedback, hosted/manual gates and final UI capture approval remain unresolved; nothing has been submitted or published.
 - External dependency: developer account, required registration, submission authorization, and store review.
 
 ## Commit and push routine

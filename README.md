@@ -2,7 +2,7 @@
 
 A planned Chrome extension for daily learning goals, automatic activity tracking on supported websites, saved Continue links, milestone points, and optional reminders.
 
-**Current stage:** Step 17 — Local release checks, CI, package/update checks and operations guidance are prepared. Live Supabase/SMTP, production retention/budget settings and store validation remain pending.
+**Current stage:** Steps 18–19 local preparation — beta bundle/diagnostics and store review drafts/assets are prepared. Actual participant testing, hosted release checks, publisher/policy setup and store submission remain pending.
 
 ## Project documents
 
@@ -12,6 +12,10 @@ A planned Chrome extension for daily learning goals, automatic activity tracking
 - [DEVLOG.md](DEVLOG.md) — Completed work and decisions.
 - [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) — Repeatable release checks, acceptance evidence and external gates.
 - [OPERATIONS.md](OPERATIONS.md) — Deployment, provider outage switch, cost controls and recovery.
+- [BETA_START_HERE.md](BETA_START_HERE.md) — Participant installation and first learning session.
+- [BETA_FEEDBACK.md](BETA_FEEDBACK.md) — Voluntary observation checklist and manual aggregate tally.
+- [BETA_LIMITATIONS.md](BETA_LIMITATIONS.md) — Current compatibility and data/reliability limits.
+- [store/README.md](store/README.md) — Listing, policy/disclosure/reviewer drafts, screenshots and submission gates.
 
 ## Planned stack
 
@@ -25,7 +29,7 @@ Browser tracking can discourage casual skipping but cannot guarantee that activi
 
 Follow BUILD_PLAN.md one checkpoint at a time. Update DEVLOG.md with each completed checkpoint, review the diff, then commit and push the intended files. GitHub pushes and Chrome Web Store publication are separate operations.
 
-The next packaging checkpoint is **18 — Beta package and user feedback**. Public release remains gated by [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md).
+The local roadmap preparation is complete through **19 — Chrome Web Store submission and launch**. Actual beta observations, hosted/manual gates and authorized store submission/publication remain open in [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md).
 
 Repository visibility and license are still undecided. No license is granted by this planning document.
 
@@ -157,3 +161,17 @@ Run npm run check with the installed Playwright Chromium path configured as desc
 Migration 5 adds an operator-only GeeksforGeeks cloud acceptance switch. While paused, submissions stay pending and retry after five minutes; existing accepted receipts remain replayable. Device-only progress remains local. See OPERATIONS.md for pause/resume and the unresolved production setup.
 
 Run npm run test:site separately for a live article-identification probe; it does not claim full article completion. STREAK_RELEASE=1 requires public cloud configuration for a configured candidate build, but does not approve launch. Follow RELEASE_CHECKLIST.md before building for real users.
+
+## Step 18: build and try the beta bundle
+
+Run npm run beta with Playwright Chromium configured. It runs the full local check gate first, then creates a new .output/beta-VERSION-TIMESTAMP folder containing extension.zip, the three beta documents, CHECKSUMS.sha256 and BUILD_INFO.json. The metadata labels cloud configuration, checked source revision, uncommitted changes and the fact that participant testing/public launch are not approved by packaging. Only this allowlisted bundle is copied; .env files, browser profiles and user exports are excluded. CI also prepares the bundle after successful checks.
+
+Follow BETA_START_HERE.md to extract/install the extension and try a real article. Settings → Your data → Export beta diagnostics prepares a user-reviewed JSON file with version/permission states and counts. It contains no goal names, article URLs, account identifiers, raw evidence or errors. Nothing is transmitted automatically. Do not confuse diagnostics with the private device/account exports. No analytics SDK or automatic measurement was added.
+
+BETA_FEEDBACK.md records no fabricated results: setup, first real completion, Continue, optional reminders and one-week follow-up remain participant tasks. Agree a private feedback channel and observation consent before recruitment. Any reported failures should receive their own reproducible fix/checkpoint. BETA_LIMITATIONS.md documents local-only default configuration and the remaining hosted/manual checks.
+
+## Step 19: store review drafts and images
+
+Run npm run store:prepare with Playwright Chromium configured. After all local checks it creates a checked beta bundle and a .output/store-draft-VERSION-TIMESTAMP folder with listing copy, privacy/disclosure/reviewer drafts, release notes, a padded 128px icon and three verified 1280×800 screenshots. Captures use the actual UI with labeled synthetic records and visible development badges. RELEASE_INFO.json records the package/source identity, image hashes and unresolved gates. CI also prepares these artifacts without uploading real profiles or user data.
+
+These are review materials, not a store submission. store/STATUS.json explicitly records submitted/approved/published as false. Publisher/contact details, public policy/support URLs, actual production services/retention, real beta observations and final release UI captures need completion before upload. No developer account, paid service, submission or publication was performed.

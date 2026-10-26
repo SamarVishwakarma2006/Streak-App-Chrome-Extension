@@ -29,7 +29,10 @@
     "check": "node scripts/check.mjs",
     "test:config": "node scripts/config.mjs",
     "test:release": "node scripts/release.mjs",
-    "test:site": "node scripts/reading-smoke.mjs --live"
+    "test:site": "node scripts/reading-smoke.mjs --live",
+    "test:beta": "node scripts/beta-test.mjs",
+    "beta": "npm run check && node scripts/beta.mjs",
+    "store:prepare": "npm run check && node scripts/store.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.118.0",
