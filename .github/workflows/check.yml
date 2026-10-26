@@ -1,0 +1,41 @@
+name: Extension checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: extension-checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run check
+      - name: Upload check results
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: local-check-results
+          path: test-results/release-checks.json
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Upload checked development package
+        if: success()
+        uses: actions/upload-artifact@v5
+        with:
+          name: checked-development-extension
+          path: |
+            .output/*-chrome.zip
+            .output/release-sha256.txt
+          retention-days: 7

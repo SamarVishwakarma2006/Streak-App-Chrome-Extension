@@ -2,7 +2,7 @@
 
 A planned Chrome extension for daily learning goals, automatic activity tracking on supported websites, saved Continue links, milestone points, and optional reminders.
 
-**Current stage:** Step 14 — Optional daily reminders and contextual learning nudges are implemented. Local reading and reminders work without an account. A configured Supabase development project is still required for real sign-in and cloud records; no hosted deployment has occurred.
+**Current stage:** Step 17 — Local release checks, CI, package/update checks and operations guidance are prepared. Live Supabase/SMTP, production retention/budget settings and store validation remain pending.
 
 ## Project documents
 
@@ -10,6 +10,8 @@ A planned Chrome extension for daily learning goals, automatic activity tracking
 - [ARCHITECTURE.md](ARCHITECTURE.md) — Tech stack, extension structure, server responsibilities, and data design.
 - [BUILD_PLAN.md](BUILD_PLAN.md) — Numbered implementation steps, checks, and suggested commit messages.
 - [DEVLOG.md](DEVLOG.md) — Completed work and decisions.
+- [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) — Repeatable release checks, acceptance evidence and external gates.
+- [OPERATIONS.md](OPERATIONS.md) — Deployment, provider outage switch, cost controls and recovery.
 
 ## Planned stack
 
@@ -23,7 +25,7 @@ Browser tracking can discourage casual skipping but cannot guarantee that activi
 
 Follow BUILD_PLAN.md one checkpoint at a time. Update DEVLOG.md with each completed checkpoint, review the diff, then commit and push the intended files. GitHub pushes and Chrome Web Store publication are separate operations.
 
-The next implementation checkpoint is **15 — History, milestones, and interface completion**.
+The next packaging checkpoint is **18 — Beta package and user feedback**. Public release remains gated by [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md).
 
 Repository visibility and license are still undecided. No license is granted by this planning document.
 
@@ -113,7 +115,7 @@ Run `npm.cmd run test:reminders` after building. The isolated browser package ca
 ## Step 13: see cloud synchronization
 
 1. Build/reload the extension and open **Settings**. The account and cloud controls are visible without configuration; device-only tracking continues to work.
-2. For real cloud use, follow [the Supabase setup guide](supabase/README.md), apply all three migrations, configure the public project values, rebuild/reload, and sign in.
+2. For real cloud use, follow [the Supabase setup guide](supabase/README.md), apply all current migrations, configure the public project values, rebuild/reload, and sign in.
 3. Create a device goal, connect it to GeeksforGeeks in **Connections**, then use **Copy goal definitions to my account** in Settings.
 4. Press **Enable cloud sync**, then start a supported article you have not already opened with the tracker. Existing article checkpoints and prototype XP are not imported.
 5. After qualification, **Cloud records** in Today, Settings, and the popup shows pending/accepted status and cached server streak/XP totals. Use **Sync and refresh** to fetch current records from other devices.
@@ -144,6 +146,14 @@ Build/reload the extension and open **Settings → Your data**.
 3. Disconnect device tracking in **Connections**. **Disable account connection** also disables accepted GeeksforGeeks submissions across devices; cloud sync can explicitly enable it again later.
 4. **Delete account** requires typing DELETE. After the server confirms deletion, all local goals, activity, reminders, bookmarks, cloud caches and credentials on this browser are cleared. Downloaded exports and independent local activity on other devices are not remotely erased. Account caches on other devices clear when their invalid account/session is detected online.
 
-Cloud privacy controls require all four SQL migrations, including supabase/migrations/202610260004_privacy_controls.sql. No hosted project has been created. Follow supabase/README.md for the retention job setup and its current deployment limitations.
+Cloud privacy controls require the current migrations, including supabase/migrations/202610260004_privacy_controls.sql. No hosted project has been created. Follow supabase/README.md for the retention job setup and its current deployment limitations.
 
 Checks: npm run test:privacy (SQL plus isolated browser), npm run test:cloud (mocked account export/disconnect/deletion and lost-response retries). Set PLAYWRIGHT_BROWSERS_PATH as described above on this workspace. The automated browser currently cancels even plain-page JSON file persistence: the privacy check verifies the real Blob contents, filename and download initiation separately. Save/open one export in normal Chrome before release. Fixture profiles and screenshots remain under ignored test-results.
+
+## Step 17: repeatable checks and release preparation
+
+Run npm run check with the installed Playwright Chromium path configured as described above. It runs checks sequentially, packages the extension, loads the extracted ZIP in an isolated profile and verifies stored goals survive a version-change fixture. Results go to test-results/release-checks.json; the ZIP and SHA-256 file go to .output. GitHub Actions runs this same gate after pushes to main and pull requests, without live credentials.
+
+Migration 5 adds an operator-only GeeksforGeeks cloud acceptance switch. While paused, submissions stay pending and retry after five minutes; existing accepted receipts remain replayable. Device-only progress remains local. See OPERATIONS.md for pause/resume and the unresolved production setup.
+
+Run npm run test:site separately for a live article-identification probe; it does not claim full article completion. STREAK_RELEASE=1 requires public cloud configuration for a configured candidate build, but does not approve launch. Follow RELEASE_CHECKLIST.md before building for real users.

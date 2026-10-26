@@ -4,6 +4,8 @@ import process from 'node:process';
 const env = { ...loadEnv('production', process.cwd(), 'WXT_'), ...process.env };
 const cloudURL = env.WXT_SUPABASE_URL;
 const cloudKey = env.WXT_SUPABASE_PUBLISHABLE_KEY;
+if (Object.keys(env).some(name => /^WXT_.*(SECRET|SERVICE_ROLE|PASSWORD|PRIVATE_KEY|ACCESS_TOKEN)/i.test(name) && env[name])) throw new Error('Secret-like WXT variables are forbidden. WXT variables are public extension code.');
+if (env.STREAK_RELEASE === '1' && (!cloudURL || !cloudKey)) throw new Error('Release candidate builds require a Supabase HTTPS origin and public publishable key.');
 if (cloudURL || cloudKey) {
   if (!cloudURL || !/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(cloudURL) || !cloudKey?.startsWith('sb_publishable_')) throw new Error('Use a Supabase project HTTPS origin (no trailing slash) and public sb_publishable_ key. Never use a secret key.');
 }

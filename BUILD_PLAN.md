@@ -243,6 +243,7 @@ You control GitHub publishing. These documents do not record a successful push u
 - Verify production authentication/email delivery and supported-site compatibility.
 - Check: packaged production build and a clean install/update path.
 - Suggested commit: `chore: prepare production configuration and release checks`
+- Status: local release preparation implemented on 2026-10-26. Repeatable sequential checks, credential-free CI, configured-build guards, ZIP/install/version-change checks, server provider pause/retry and operations/acceptance documents are prepared. Hosted authentication/email delivery, concurrent connections, retention/alerts, native Chrome save/notification UI and store updates remain external gates; this step does not authorize public launch.
 - External dependency: production service access and decisions about plans, domain, support, and retention.
 
 ## 18 — Beta package and user feedback

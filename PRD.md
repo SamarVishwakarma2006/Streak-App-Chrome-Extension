@@ -197,7 +197,7 @@ The public MVP does not require a platform API if unavailable; it must then laun
 
 - Create at least three independent streaks and restore them after restarting Chrome.
 - Continue returns to the correct activity and never grants skipped progress.
-- A skipped video section and repeated playback cannot inflate unique coverage.
+- For supported articles, skipped/hidden chunks cannot inflate observed coverage. Any future video adapter must separately prove that skipped sections and repeated playback cannot inflate unique coverage.
 - Duplicate tabs, retried requests, and concurrent devices cannot issue duplicate completion XP.
 - Users cannot write official completions, XP, or another user's records directly through the database API.
 - Editing local data cannot change authoritative cloud XP; fabricated browser evidence remains a disclosed limitation.
@@ -230,3 +230,7 @@ Before integration discovery, users may explicitly approve a site and save a man
 ## Step 16 delivery note (2026-10-26)
 
 Settings now offers device/account JSON exports, typed confirmation for device activity cleanup and account deletion, and account-wide GeeksforGeeks disconnection. Device cleanup preserves goal definitions and cloud records; confirmed account deletion clears all local goals and activity on the requesting device. Exports omit authentication credentials and queued evidence. Migration 4 and the retention schedule are prepared locally. Hosted deletion/session verification, activated retention jobs, actual production backup/provider-log retention and normal Chrome file saving remain release checks.
+
+## Step 17 delivery note (2026-10-26)
+
+RELEASE_CHECKLIST.md maps release acceptance criteria to local evidence and remaining hosted/manual checks. A repeatable sequential gate and GitHub Actions workflow use fictional accounts; a packaged version-change fixture checks device persistence. The server operator can pause new GeeksforGeeks cloud acceptance without deleting saved pending submissions. Production SMTP, actual multi-connection/JWT behavior, billing alerts, retention/restore policy and store checks remain external release gates. Video tracking remains unsupported.

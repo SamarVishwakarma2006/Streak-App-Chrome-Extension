@@ -2,7 +2,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { browser } from 'wxt/browser';
 import type { GoalStore } from './goals';
 
-const url = import.meta.env.WXT_SUPABASE_URL as string | undefined;
+const url = (import.meta.env.WXT_SUPABASE_URL as string | undefined) || undefined;
 const key = import.meta.env.WXT_SUPABASE_PUBLISHABLE_KEY as string | undefined;
 let client: SupabaseClient | undefined;
 const storageKey = url ? `auth:${new URL(url).host}` : 'auth:unconfigured';

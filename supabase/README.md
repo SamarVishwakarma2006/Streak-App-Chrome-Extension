@@ -210,7 +210,7 @@ and [PostgreSQL row locks](https://www.postgresql.org/docs/17/explicit-locking.h
 
 ## Step 13: extension synchronization
 
-The extension now calls the Step 12 RPCs through its authenticated SDK session. Apply all three migrations before enabling sync. Sign in, copy device goal definitions, connect a device goal to GeeksforGeeks, and enable cloud sync in Settings. Start a new article afterward; existing reading checkpoints and local XP are excluded.
+The extension now calls the Step 12 RPCs through its authenticated SDK session. Apply all current migrations before enabling sync. Sign in, copy device goal definitions, connect a device goal to GeeksforGeeks, and enable cloud sync in Settings. Start a new article afterward; existing reading checkpoints and local XP are excluded.
 
 Requests contain only the event UUID, cloud goal/rule IDs, canonical article path and allowed evidence fields. Responses are reconciled by UUID; totals are freshly fetched with get_streak_summary instead of incrementing local XP from a possibly replayed response. RATE_LIMIT schedules a delayed retry, transient errors preserve the immutable request, and business rejections are shown to the user. The server receipt-date policy still applies to offline submissions.
 
@@ -218,7 +218,7 @@ The local cloud queue is owner/generation-scoped and expires pending records aft
 
 ## Step 16: export, deletion and retention
 
-Apply migrations 1–4 in filename order. Migration 4 adds export_my_account(), delete_my_account(confirmation text), and private.cleanup_expired_evidence(). The export/deletion RPCs are authenticated and always derive their owner from auth.uid(); callers cannot supply a user ID. The fixed-path definer function deletes that identity and cascades application data in a single transaction. This application uses no Supabase Storage buckets. If Storage is added later, owned objects must be handled before account deletion.
+Apply all current migrations in filename order. Migration 4 adds export_my_account(), delete_my_account(confirmation text), and private.cleanup_expired_evidence(). The export/deletion RPCs are authenticated and always derive their owner from auth.uid(); callers cannot supply a user ID. The fixed-path definer function deletes that identity and cascades application data in a single transaction. This application uses no Supabase Storage buckets. If Storage is added later, owned objects must be handled before account deletion.
 
 Deletion uses the existing authenticated session plus typed DELETE confirmation. It is safe to retry after losing the response while the original access token is still valid. If that token expires after an unconfirmed deletion, sign-in/support verification may be needed; device cleanup is still available independently. Session/identity rejection on other devices clears their account caches on the next online check. Previously issued JWTs can remain cryptographically valid until expiration; deleted identities cannot recreate profiles or ingest activity because the identity/profile foreign keys and RPC checks prevent it.
 
@@ -237,3 +237,7 @@ As of 2026-10-26 there is no hosted Supabase project, production backup, PITR co
 Production backup/PITR retention, hosted Auth/database/API logs and any operator-created dumps are **not configured or verified**. Before launch, record the selected project's actual settings, backup expiry and restore handling, and publish them in the privacy disclosure. Do not claim that deleting one account immediately erases it from existing backups. On restoring a backup, reapply confirmed post-backup deletions before reopening service. Keep any deletion audit process minimal and exclude raw activity or credentials.
 
 References: [Supabase user management](https://supabase.com/docs/guides/auth/managing-user-data), [Cron quickstart](https://supabase.com/docs/guides/cron/quickstart), [Database backups](https://supabase.com/docs/guides/platform/backups).
+
+## Step 17: operator controls and release preparation
+
+Apply migration 5 after migrations 1–4. It adds private.adapter_status and gates new ingestion while preserving accepted UUID replay. Only the migration owner/service role can change the flag. PROVIDER_PAUSED defers the extension outbox for five minutes; it does not create a completion. The local prototype does not depend on this server flag. See ../OPERATIONS.md for administrative pause/resume SQL, hosted verification, spending/alerts and recovery. See ../RELEASE_CHECKLIST.md for the release acceptance matrix. No live settings are configured by these files.

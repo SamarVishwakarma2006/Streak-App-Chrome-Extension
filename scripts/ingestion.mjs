@@ -43,6 +43,15 @@ try {
   assert.equal(accepted.summary.current,1); assert.equal(accepted.summary.best,1); assert.equal(accepted.summary.xp,25);
   assert.equal(accepted.summary.local_date,(await sql('select current_date::text as date'))[0].date);
   assert.deepEqual(await submit(first,{id:event,activity}),{...accepted,replayed:true});
+  await assert.rejects(()=>db.exec('update private.adapter_status set enabled=false'),e=>e.code==='42501');
+  await admin("update private.adapter_status set enabled=false where provider_id='geeksforgeeks'");
+  assert.deepEqual(await submit(first,{id:event,activity}),{...accepted,replayed:true},'A pause preserves old accepted receipts');
+  const pausedId=randomUUID(),pausedActivity='/python/paused-article/';
+  assert.deepEqual(await submit(first,{id:pausedId,activity:pausedActivity}),{status:'pending',code:'PROVIDER_PAUSED',retry_after_seconds:300});
+  assert.equal((await sql('select * from public.activity_events where event_uuid=$1',[pausedId])).length,0);
+  await admin("update private.adapter_status set enabled=true where provider_id='geeksforgeeks'");
+  assert.equal((await submit(first,{id:pausedId,activity:pausedActivity})).status,'already_complete','The saved ID retries after resuming without extra daily XP');
+
   assert.equal((await submit(first,{id:event,activity:'/python/changed/'})).code,'EVENT_CONFLICT');
   assert.equal((await submit(first)).status,'already_complete');
   const second = await goal(2);

@@ -50,7 +50,8 @@ async function mock() {
       else if (url.includes('/daily_completions')) result = [{local_date:'2026-10-25'},{local_date:'2026-10-26'}];
       else if (url.includes('/milestone_awards')) result = [{milestone:3}];
       else if (url.includes('/submit_reading_event')) {
-        if (globalThis.mode === 'rate') result = { status: 'rejected', code: 'RATE_LIMIT', retry_after_seconds: 60 };
+        if (globalThis.mode === 'paused') result = {status:'pending',code:'PROVIDER_PAUSED',retry_after_seconds:300};
+        else if (globalThis.mode === 'rate') result = { status: 'rejected', code: 'RATE_LIMIT', retry_after_seconds: 60 };
         else if (globalThis.mode === 'stale') result = { status: 'rejected', code: 'STALE_RULE' };
         else if (globalThis.mode === 'duplicate') result = { status: 'rejected', code: 'ACTIVITY_ALREADY_CREDITED' };
         else {
@@ -143,6 +144,15 @@ try {
   const expired = await addArticle('expired', 8 * 86400000);
   await request('cloud', 'retry'); assert.equal((await read()).events.find(e => e.id === expired).status, 'expired');
   assert.ok(!(await submissions()).some(c => c.body.p_event_uuid === expired));
+  const maintenanceId=await addArticle('provider-maintenance');
+  await worker.evaluate(()=>{globalThis.mode='paused';}); await request('cloud','retry');
+  const deferred=(await read()).events.find(e=>e.id===maintenanceId);
+  assert.equal(deferred.status,'pending'); assert.ok(deferred.retryAt>Date.now()+290000); assert.match(deferred.detail,/paused for maintenance/);
+  assert.ok(deferred.payload,'Keep immutable evidence during a provider outage');
+  await page.getByText('GeeksforGeeks cloud submissions are paused for maintenance.',{exact:false}).waitFor();
+  await page.screenshot({path:'test-results/provider-paused.png',fullPage:true});
+  await worker.evaluate(()=>{globalThis.mode='normal';}); await readyRetries(); await request('cloud','retry');
+  assert.equal((await read()).events.find(e=>e.id===maintenanceId).status,'accepted');
   for (const mode of ['stale', 'duplicate', 'rate']) {
     const id = await addArticle(`${mode}-article`);
     await worker.evaluate(mode => { globalThis.mode = mode; }, mode); await request('cloud', 'retry');

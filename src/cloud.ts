@@ -4,7 +4,7 @@ import { GFG_KEY, GFG_ORIGIN, type ReadingState } from './reading';
 import { STORE_KEY, type GoalStore } from './goals';
 import { monthDays, type CloudHistory } from './history';
 
-const project = import.meta.env.WXT_SUPABASE_URL as string | undefined;
+const project = (import.meta.env.WXT_SUPABASE_URL as string | undefined) || undefined;
 export const CLOUD_KEY = `cloud:${project ?? 'unconfigured'}`;
 const WEEK = 7 * 86400000;
 export type CloudBinding = { generation: string; eventId: string; streakId: string; ruleId: string };
@@ -108,6 +108,9 @@ async function synchronize(force = false) {
       if (error) throw new Error('Submission could not be confirmed. Its original ID is saved for retry.');
       if (data?.code === 'RATE_LIMIT') {
         event.retryAt = Date.now() + 60000; event.detail = 'Server is busy. Retrying after one minute.'; await save(state); break;
+      }
+      if (data?.code === 'PROVIDER_PAUSED') {
+        event.retryAt = Date.now() + 300000; event.detail = 'GeeksforGeeks cloud submissions are paused for maintenance. Your submission is saved; retrying in five minutes.'; await save(state); break;
       }
       if (!['accepted', 'already_complete', 'rejected'].includes(data?.status)) throw new Error('Unexpected server response. Submission remains pending.');
       event.status = data.status;
