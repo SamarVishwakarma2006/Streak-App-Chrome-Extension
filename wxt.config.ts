@@ -19,7 +19,7 @@ export default defineConfig({
     optional_permissions: ['notifications'],
     ...(cloudURL ? { host_permissions: [cloudURL + '/*'] } : {}),
     optional_host_permissions: ['https://www.geeksforgeeks.org/*'],
-    description: 'Development preview of your daily learning companion.',
+    description: 'Build learning streaks from supported GeeksforGeeks articles, save your place, and get optional reminders.',
     action: { default_title: 'Open Streak Maintaining App' },
     icons: {
       16: '/icon/16.png',

@@ -1,8 +1,8 @@
 # Streak Maintaining App
 
-A planned Chrome extension for daily learning goals, automatic activity tracking on supported websites, saved Continue links, milestone points, and optional reminders.
+A Chrome extension beta for daily learning goals, automatic activity tracking on supported websites, saved Continue links, milestone points, and optional reminders.
 
-**Current stage:** Steps 18–19 local preparation — beta bundle/diagnostics and store review drafts/assets are prepared. Actual participant testing, hosted release checks, publisher/policy setup and store submission remain pending.
+**Current stage:** Final local polish — real Today progress, setup guidance, beta bundle/diagnostics and store review drafts/assets are prepared. Actual participant testing, hosted release checks, publisher/policy setup and store submission remain pending.
 
 ## Project documents
 
@@ -17,13 +17,13 @@ A planned Chrome extension for daily learning goals, automatic activity tracking
 - [BETA_LIMITATIONS.md](BETA_LIMITATIONS.md) — Current compatibility and data/reliability limits.
 - [store/README.md](store/README.md) — Listing, policy/disclosure/reviewer drafts, screenshots and submission gates.
 
-## Planned stack
+## Tech stack
 
-Chrome Manifest V3, WXT, React, TypeScript, and Supabase Auth/Postgres/Edge Functions.
+Chrome Manifest V3, WXT, React and TypeScript. Optional cloud services use Supabase Auth and Postgres RPCs with row-level security. Playwright and local PGlite/Postgres checks cover the browser and database flows.
 
 ## Verification
 
-Browser tracking can discourage casual skipping but cannot guarantee that activity was not fabricated. Platform verification requires independent evidence from an authorized platform integration. Supported websites will be listed when an integration has been implemented and checked.
+Browser tracking can discourage casual skipping but cannot guarantee that activity was not fabricated. Platform verification requires independent evidence from an authorized platform integration. The current adapter supports individual free GeeksforGeeks Python and DSA articles.
 
 ## Development workflow
 
@@ -33,9 +33,13 @@ The local roadmap preparation is complete through **19 — Chrome Web Store subm
 
 Repository visibility and license are still undecided. No license is granted by this planning document.
 
-## Try the streak prototype
+## Try the finished local beta
 
-Reload the extension, open the dashboard, select **Explore design demo**, then use **Streak scenario**. Seven fictional completions give a seven-day streak and 245 prototype XP. A missed day resets the current streak to zero; the restart scenario shows one day and 270 XP. These controls never mark a saved goal complete.
+Run `npm run build`, then load or reload `.output/chrome-mv3` at `chrome://extensions`. Pin the extension and open its dashboard from the popup.
+
+Create a goal with a daily target of **1 Lesson**, follow **Connect a website**, and connect GeeksforGeeks. Open a supported article from Connections. Today shows recorded completions across active goals; completed cards are marked. Archived goals are excluded. History and Rewards show your saved records. No account is needed for this local path.
+
+The fictional design demo has been retired. Streak reset and milestone rules remain covered by `npm run test:streaks`. Real cloud setup, native Chrome checks and participant feedback remain prerequisites for public launch.
 
 ## First integration
 
@@ -56,7 +60,7 @@ Only supported individual free Python/DSA articles are included. Tutorial hubs, 
 
 Checks: `npm.cmd run test:reading`, `npm.cmd run test:reading:browser`, and `npm.cmd run test:smoke` (after a build). Browser checks need the installed Playwright Chromium. The reading browser test runs a real 60-second threshold on synthetic content in an isolated test package; it pre-grants only the declared optional host to avoid automating Chrome's consent dialog. Add `--live` when invoking `node scripts/reading-smoke.mjs --live` for a small public-page compatibility check.
 
-Next checkpoint: **15 — History, milestones, and interface completion**.
+Next release work: complete the external checks in [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md).
 
 ## Step 09: interruption recovery
 
@@ -172,6 +176,6 @@ BETA_FEEDBACK.md records no fabricated results: setup, first real completion, Co
 
 ## Step 19: store review drafts and images
 
-Run npm run store:prepare with Playwright Chromium configured. After all local checks it creates a checked beta bundle and a .output/store-draft-VERSION-TIMESTAMP folder with listing copy, privacy/disclosure/reviewer drafts, release notes, a padded 128px icon and three verified 1280×800 screenshots. Captures use the actual UI with labeled synthetic records and visible development badges. RELEASE_INFO.json records the package/source identity, image hashes and unresolved gates. CI also prepares these artifacts without uploading real profiles or user data.
+Run npm run store:prepare with Playwright Chromium configured. After all local checks it creates a checked beta bundle and a .output/store-draft-VERSION-TIMESTAMP folder with listing copy, privacy/disclosure/reviewer drafts, release notes, a padded 128px icon and three verified 1280×800 screenshots. Captures use the actual UI with labeled synthetic records and visible beta badges. RELEASE_INFO.json records the package/source identity, image hashes and unresolved gates. CI also prepares these artifacts without uploading real profiles or user data.
 
 These are review materials, not a store submission. store/STATUS.json explicitly records submitted/approved/published as false. Publisher/contact details, public policy/support URLs, actual production services/retention, real beta observations and final release UI captures need completion before upload. No developer account, paid service, submission or publication was performed.

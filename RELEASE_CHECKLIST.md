@@ -43,7 +43,8 @@ or a complete comparison against an old released binary.
 The GitHub workflow runs the same command for pull requests and pushes to main.
 It needs no account secrets and has read-only repository permission. It uploads
 only the check report, checked development ZIP/checksum and allowlisted beta/store draft bundles, with seven-day artifact
-retention. Browser profiles, exports and screenshots are not uploaded. The first
+retention. Browser profiles, exports and incidental test screenshots are excluded; only the
+three labeled store captures are included in the draft bundle. The first
 remote workflow run is pending until this change is pushed.
 
 ## Acceptance evidence
@@ -117,8 +118,7 @@ sandbox. No account or cloud completion was involved.
    configuration, a non-Supabase origin, a secret key or secret-like WXT variable
    fails the build. Only publishable configuration belongs in the extension.
    Passing this gate does not verify that the project exists, SMTP works, or the
-   checklist is complete. Development badges remain until beta/release presentation
-   is finalized. Never upload a fixture-configured test package to the store.
+   checklist is complete. Beta badges identify this candidate; they do not imply store approval. Never upload a fixture-configured test package to the store.
 6. Verify actual hosted ownership, concurrent ingestion, notifications, export,
    deletion, outage recovery and retention. Record date, package checksum, expected
    outcome and result; exclude credentials and user activity from the report.

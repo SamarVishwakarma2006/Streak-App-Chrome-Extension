@@ -86,33 +86,20 @@ nav a[aria-current] { color: var(--green); background: #dfe9d8; font-weight: 650
 .page-heading p:not(.eyebrow) { font-size: 14px; }
 .preview-control { display: flex; flex-direction: column; gap: 6px; font-size: 10px; color: var(--muted); }
 select { min-height: 36px; border: 1px solid #cbd5c6; border-radius: 7px; color: var(--ink); background: white; padding: 6px 28px 6px 10px; font-size: 12px; }
-.preview-notice { display: flex; align-items: center; gap: 9px; margin-bottom: 28px; padding: 10px 14px; border: 1px solid #e3dfce; border-radius: 8px; background: #f7f4e9; font-size: 11px; }
-.preview-notice p { color: #6b634b; }
-.notice-dot { width: 5px; height: 5px; background: #8b7745; border-radius: 50%; flex: 0 0 auto; }
-.today-layout { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 28px; }
-.today-main { min-width: 0; }
 .day-summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 26px 28px; background: #e7eedf; border: 1px solid #dce5d4; border-radius: var(--radius); }
 .day-summary .eyebrow { color: #526447; margin-bottom: 10px; }
 .day-summary h2 { font-size: 25px; margin-bottom: 8px; }
 .day-summary p:not(.eyebrow) { font-size: 12px; color: #54644d; }
-.day-ring { width: 84px; height: 84px; flex: 0 0 auto; border-radius: 50%; padding: 6px; background: conic-gradient(var(--green) 0 33.333%, #cddbc2 33.333% 100%); transform: rotate(-90deg); }
-.day-ring > span { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; background: #e7eedf; border-radius: 50%; transform: rotate(90deg); }
-.day-ring strong { font-size: 25px; line-height: 1.2; }
-.day-ring strong span { font-size: 14px; font-weight: 400; color: #586b50; }
-.day-ring small { font-size: 9px; color: #586b50; }
 .section-heading { display: flex; justify-content: space-between; gap: 12px; margin: 28px 0 14px; align-items: center; }
 .section-heading h2 { font-size: 17px; }
 .section-heading > span { font-size: 11px; color: var(--muted); }
 .goal-list { display: grid; gap: 12px; }
 .goal-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; align-items: start; }
 .goal-symbol { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 11px; font-size: 16px; font-weight: 650; }
-.amber { background: #f6ecd6; color: #7f5d20; }
-.purple { background: #eee8f5; color: #70528c; }
 .green { background: #e5efdf; color: #406637; }
 .goal-content { min-width: 0; }
 .goal-title-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 5px 10px; }
 .goal-title-row h3 { font-size: 14px; overflow-wrap: anywhere; }
-.streak-count { font-size: 11px; color: #98601d; white-space: nowrap; font-weight: 600; }
 .lesson { margin-top: 4px; font-size: 12px; overflow-wrap: anywhere; }
 .progress-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
 .progress-row > span { white-space: nowrap; font-size: 10px; color: var(--muted); }
@@ -124,37 +111,12 @@ progress::-moz-progress-bar { background: #64865c; border-radius: 8px; }
 .goal-action { grid-column: 2; justify-self: start; margin-top: 2px; }
 .is-complete { background: #fafcf7; }
 .quiet-note { font-size: 11px; margin: 18px 0; }
-.insights { display: grid; align-content: start; gap: 18px; }
 .week-card { padding: 23px 20px; border: 1px solid var(--line); border-radius: var(--radius); background: white; }
 .week-card h2 { font-size: 17px; margin: 10px 0 20px; }
 .week-card > p:last-child { font-size: 11px; margin-top: 18px; }
-.week-dots { display: flex; justify-content: space-between; gap: 4px; }
-.week-dots > div { display: flex; flex-direction: column; align-items: center; gap: 7px; }
-.week-dots span { color: var(--muted); font-size: 9px; }
-.week-dots b { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; background: #f1f4ed; font-size: 11px; font-weight: 500; }
-.week-dots .day-done { background: var(--green); color: white; }
-.week-dots .day-now { border: 1px solid var(--green); color: var(--green); }
-.milestone-card { background: #f1ece1; border: 1px solid #e6dece; border-radius: var(--radius); padding: 23px 20px; }
-.milestone-symbol { font-size: 36px; color: #80683d; line-height: 1; display: block; margin-bottom: 20px; }
-.milestone-card .eyebrow { color: #786442; }
-.milestone-card h2 { font-size: 18px; margin: 9px 0; }
-.milestone-card > p:not(.eyebrow) { font-size: 12px; }
-.milestone-bottom { display: flex; justify-content: space-between; border-top: 1px solid #dcd3c1; padding-top: 16px; margin-top: 20px; font-size: 11px; color: #756348; }
-.milestone-bottom strong { color: #6e572e; }
-.gentle-note { padding: 8px 10px; }
-.gentle-note h3 { font-size: 12px; margin-bottom: 8px; }
-.gentle-note p { font-size: 11px; line-height: 1.8; }
 .dashboard-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-top: 1px solid var(--line); padding: 20px 0 0; margin-top: 36px; font-size: 10px; color: var(--muted); }
-.empty-state, .section-placeholder { padding: 48px 24px; text-align: center; border: 1px dashed #b9cbb6; border-radius: var(--radius); background: #fbfcf8; }
-.empty-state p, .section-placeholder p { max-width: 450px; margin: 12px auto 0; font-size: 13px; }
-.empty-symbol { display: inline-grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: #e5edde; color: #45653a; font-size: 25px; margin-bottom: 20px; }
-.section-placeholder { padding: 72px 24px; }
-.section-placeholder .button { margin-top: 24px; }
-.loading-state { display: grid; gap: 12px; }
-.skeleton { height: 150px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 24px; }
-.skeleton span { display: block; width: 65%; height: 12px; background: #e8ece3; border-radius: 6px; margin-bottom: 20px; animation: pulse 1.8s ease-in-out infinite; }
-.skeleton span:last-child { width: 90%; height: 6px; }
-@keyframes pulse { 50% { opacity: 0.45; } }
+.empty-state { padding: 48px 24px; text-align: center; border: 1px dashed #b9cbb6; border-radius: var(--radius); background: #fbfcf8; }
+.empty-state p p { max-width: 450px; margin: 12px auto 0; font-size: 13px; }
 .goal-dialog { border: 1px solid var(--line); border-radius: var(--radius); max-width: min(430px, calc(100vw - 32px)); padding: 28px; color: var(--ink); background: #f9faf6; box-shadow: 0 24px 90px #182b3830; }
 .goal-dialog::backdrop { background: #10271bb0; }
 .goal-dialog h2 { margin: 12px 0; }
@@ -185,11 +147,6 @@ progress::-moz-progress-bar { background: #64865c; border-radius: 8px; }
   .goal-card { grid-template-columns: 40px minmax(0, 1fr) auto; }
   .goal-action { grid-column: 3; grid-row: 1; align-self: center; }
 }
-@media (max-width: 1100px) {
-  .today-layout { grid-template-columns: minmax(0, 1fr); }
-  .insights { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .gentle-note { grid-column: 1 / -1; }
-}
 @media (max-width: 720px) {
   .app-layout { display: block; }
   .sidebar { position: static; height: auto; padding: 16px; border-right: 0; border-bottom: 1px solid var(--line); }
@@ -204,7 +161,6 @@ progress::-moz-progress-bar { background: #64865c; border-radius: 8px; }
   .page-heading { align-items: start; }
   .page-heading h1 { font-size: 34px; }
   .day-summary { padding: 20px; }
-  .insights { grid-template-columns: minmax(0, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -241,3 +197,14 @@ button:disabled { opacity: .6; cursor: wait; }
 .site-approval input { width: auto; margin-top: 5px; }
 .goal-dialog { max-height: calc(100vh - 32px); overflow-y: auto; }
 .saved-goals.compact .goal-action { grid-column: 1 / -1; grid-row: auto; }
+
+/* Today uses actual device records; setup is derived from existing connection state. */
+.day-summary { margin-bottom: 24px; }
+.day-total { min-width: 100px; text-align: right; }
+.day-total strong { display: block; font-size: 32px; line-height: 1.3; }
+.day-total span { display: block; font-size: 11px; color: var(--muted); }
+.day-total progress { margin-top: 12px; height: 7px; }
+.setup-note { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 12px; background: white; margin: 18px 0; }
+.setup-note p { max-width: 500px; font-size: 12px; margin-top: 6px; }
+.completed-label { font-size: 11px; color: var(--green); font-weight: 650; }
+.empty-state .button { margin-top: 20px; }

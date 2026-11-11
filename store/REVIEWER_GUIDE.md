@@ -18,8 +18,8 @@ credentials have been configured. Never put a real email code/password/token in 
    Continue, revisiting the same article or jumping to its bottom must not award
    skipped coverage or duplicate rewards. A restored position is not completion.
 5. Check multiple goals, archive/restore and export/cleanup. Use disposable data
-   when confirming CLEAR. The design demo is explicitly sample data and does not
-   affect saved goals, rewards or cloud records.
+   when confirming CLEAR. Today counts actual completions for active device goals;
+   archived goals are excluded. There is no manual-completion demo in the app.
 6. Reminders are optional and need notification permission; use a short test time
    outside quiet hours. Contextual nudges require an unfinished tracked session and
    an away grace period. OS/browser delivery constraints are documented.
@@ -45,7 +45,7 @@ to edit storage or lower reading thresholds to speed up a completion.
 ## Assets and scope
 
 Generated screenshots are labeled sample data from the real UI in an isolated test
-profile. Development badges remain; these are draft review assets and must be
+profile. Beta badges remain; these are draft review assets and must be
 recaptured from the final release UI/package. They show no participant results,
 external-account success, GeeksforGeeks partnership or verified learning claims.
 

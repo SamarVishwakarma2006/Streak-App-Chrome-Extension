@@ -20,3 +20,5 @@ BUILD_INFO.json/RELEASE_INFO.json. A dirty working tree must remain labeled as s
 after committing/pushing, produce a clean-source candidate and repeat required
 hosted/native/beta checks before submission. Do not rewrite these notes as a record
 of publication until it actually occurs.
+
+Final local polish: Today now summarizes recorded completions across active goals, marks completed cards and guides first-time website connection. Retired the fictional design demo; retained separate local/cloud evidence labels and the beta identity.

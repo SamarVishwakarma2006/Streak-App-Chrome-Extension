@@ -19,7 +19,7 @@ This runs the existing gate, prepares the checked beta bundle and creates a new
 - RELEASE_INFO.json with asset dimensions/hashes, sample-data labels and blockers.
 
 Captures use a disposable profile and synthetic records. A small caption labels
-the sample data; development badges remain visible. The capture fixture pregrants
+the sample data; beta badges remain visible. The capture fixture pregrants
 only GeeksforGeeks in its isolated copy so the connected state can be shown; the
 distributable ZIP retains optional site permission. No real account, personal
 history, provider article content or participant result is photographed.

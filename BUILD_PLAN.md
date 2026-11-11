@@ -32,8 +32,8 @@ You control GitHub publishing. These documents do not record a successful push u
 - [x] 12 — Server completion validation and authoritative XP (local SQL checks; deployment/concurrency validation pending)
 - [x] 13 — Cloud synchronization and offline recovery (mocked service checks; hosted validation pending)
 - [x] 14 — Reminders and notification actions (native OS display/permission prompt remain manual checks)
-- [ ] 15 — History, milestones, and interface completion
-- [ ] 16 — Export, deletion, and privacy controls
+- [x] 15 — History, milestones, and interface completion (implemented locally)
+- [x] 16 — Export, deletion, and privacy controls (implemented locally; hosted/native checks pending)
 - [ ] 17 — Release validation and operational preparation
 - [ ] 18 — Beta package and user feedback
 - [ ] 19 — Chrome Web Store submission and launch
@@ -288,7 +288,7 @@ git push
 
 The placeholders must be replaced. This assumes a Git repository, configured remote, and tracked branch already exist. Repository setup and the first upstream push need the actual repository URL and branch; do not guess them.
 
-For the current documentation batch, the intended files are README.md, PRD.md, ARCHITECTURE.md, BUILD_PLAN.md, and DEVLOG.md. Suggested combined message: `docs: establish product specification and build roadmap`.
+Use the file list in the latest checkpoint handoff. The original documentation-only batch is already part of project history.
 
 Keep credentials, .env files, user exports, browser profiles, and raw operational logs out of commits. Keep source, migrations, dependency lockfiles, and human-written development notes in Git.
 
@@ -304,3 +304,7 @@ Every implementation handoff should include:
 - Copy-paste PowerShell commands to stage only this checkpoint, review, commit, and push; plus the next step.
 
 DEVLOG entries belong in the same commit as the work they describe. Git supplies commit hashes and history; do not add an extra commit merely to record the preceding commit's hash.
+
+## Final local polish — Step 19 follow-up
+
+Replaced the design demo with actual Today totals, first-goal/connection guidance, completed-card states, keyboard navigation focus and manifest-derived version display. Removed obsolete demo code/styles without changing reading or reward rules. Steps 17–19 remain open for their hosted, participant and store requirements; local preparation alone cannot close those outcomes.

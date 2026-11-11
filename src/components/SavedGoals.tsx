@@ -22,18 +22,39 @@ export function SavedGoals({ compact = false }: { compact?: boolean }) {
   if (error) return <div role="alert" className="dialog-note">{error} Reload this page to retry.</div>;
   if (!store) return <p role="status">Loading saved goals…</p>;
   const visible = store.goals.filter(g => g.archived === archived);
+  const summaries = new Map(store.goals.map(goal => [goal.id, reading?.state.ledger.goals[goal.id]
+    ? progress(reading.state.ledger, goal.id, Math.max(Date.now(), reading.state.ledger.clock)) : null]));
+  const active = store.goals.filter(goal => !goal.archived);
+  const completed = active.filter(goal => summaries.get(goal.id)?.completedToday).length;
+  const connected = reading?.allowed && active.some(goal => goal.id === reading.state.goalId);
   return <>
+    {!compact && !archived && active.length > 0 && reading && !readingError && <>
+      <section className="day-summary" aria-label="Today's device progress">
+        <div><p className="eyebrow">YOUR DAILY PRACTICE</p><h2>{completed === active.length ? 'A day well spent.' : 'One small step at a time.'}</h2>
+          <p>{completed === active.length ? 'Every active goal has a recorded completion today.' : `${active.length - completed} daily goal${active.length - completed === 1 ? '' : 's'} still open.`}</p>
+          <p>Local progress · Each goal follows its learning timezone.</p></div>
+        <div className="day-total"><strong>{completed}/{active.length}</strong><span>completed today</span>
+          <progress aria-label="Daily goals completed" max={active.length} value={completed} /></div>
+      </section>
+      {!connected && <section className="setup-note" aria-label="Set up automatic tracking">
+        <div><h3>Give your goal a place to start.</h3><p>Connect one goal to free GeeksforGeeks Python or DSA articles. Videos and exercises are not supported yet.</p></div>
+        <a className="button button-outline" href="#connections">Connect a website →</a>
+      </section>}
+    </>}
     {!compact && <div className="section-heading goal-toolbar"><div><h2>Your daily goals</h2><p>{visible.length} {archived ? 'archived' : 'active'} goals</p></div>
       <div className="goal-actions"><button className="button button-outline" onClick={() => setArchived(!archived)}>{archived ? 'Show active' : 'Show archived'}</button>
       <button className="button" disabled={busy} onClick={() => { setFailure(''); setEditor('new'); }}>New goal</button></div></div>}
     <p role="status" className="quiet-note">{message}</p>
     {readingError && <p role="alert">{readingError} Reload to retry progress.</p>}
     {failure && !editor && !deleting && <p role="alert">{failure}</p>}
-    {visible.length === 0 ? <section className="empty-state"><h3>{archived ? 'No archived goals.' : 'Your next chapter starts here.'}</h3><p>{archived ? 'Archived goals stay saved until you delete them.' : 'Create a daily goal in the dashboard to start building your routine.'}</p></section> :
+    {visible.length === 0 ? <section className="empty-state"><h3>{archived ? 'No archived goals.' : 'Your next chapter starts here.'}</h3><p>{archived ? 'Archived goals stay saved until you delete them.' : compact ? 'Create a daily goal in the dashboard to start building your routine.' : 'Start with one article a day: create a goal with a target of 1 Lesson, connect GeeksforGeeks, then read. No account needed.'}</p>
+      {!compact && !archived && <button className="button" onClick={() => { setFailure(''); setEditor('new'); }}>Create your first goal →</button>}
+    </section> :
       <div className={`goal-list saved-goals ${compact ? 'compact' : ''}`}>{visible.map(goal => {
-        const summary = reading?.state.ledger.goals[goal.id] ? progress(reading.state.ledger, goal.id, Math.max(Date.now(), reading.state.ledger.clock)) : null;
-        return <article className="goal-card" key={goal.id}>
-        <div className="goal-symbol green" aria-hidden="true">↗</div><div className="goal-content"><div className="goal-title-row"><h3>{goal.name}</h3></div>
+        const summary = summaries.get(goal.id);
+        return <article className={`goal-card${summary?.completedToday && !goal.archived ? ' is-complete' : ''}`} key={goal.id}>
+        <div className="goal-symbol green" aria-hidden="true">{summary?.completedToday && !goal.archived ? '✓' : '↗'}</div><div className="goal-content"><div className="goal-title-row"><h3>{goal.name}</h3>
+          {summary?.completedToday && !goal.archived && <span className="completed-label">Completed today</span>}</div>
           <p className="lesson">{goal.target} {goal.unit} per day</p><p className="evidence">{goal.archived ? 'Archived' : reading?.allowed && reading.state.goalId === goal.id ? 'GeeksforGeeks · Browser tracked' : 'Not connected'} · Saved on this device</p>
           {summary && <p className="lesson">{summary.current} day streak · best {summary.best} · {summary.xp} local XP</p>}
           {goal.location && <p className="lesson" title={goal.location.url}>{goal.location.title || goal.location.origin} · Bookmark</p>}</div>
@@ -44,6 +65,7 @@ export function SavedGoals({ compact = false }: { compact?: boolean }) {
           <button className="button button-quiet" disabled={busy} aria-label={`${archived ? 'Restore' : 'Archive'} ${goal.name}`} onClick={() => void mutate(archived ? 'restore' : 'archive', { id: goal.id }, archived ? 'Goal restored.' : 'Goal archived.')}>{archived ? 'Restore' : 'Archive'}</button>
           <button className="button button-outline" disabled={busy} aria-label={`Delete ${goal.name}`} onClick={() => { setFailure(''); setDeleting(goal); }}>Delete</button></>}
           {compact && !goal.location && <span className="evidence">Add a link in the dashboard</span>}
+          {!compact && !goal.archived && !goal.location && <span className="evidence">{reading?.allowed && reading.state.goalId === goal.id ? 'Open a supported article from Connections to save your place.' : 'Connect a website or add a lesson link with Edit to use Continue.'}</span>}
         </div>
       </article>; })}</div>}
     <dialog ref={dialog} className="goal-dialog" aria-labelledby="goal-editor-title" onCancel={e => { if (busy) e.preventDefault(); }} onClose={() => { setEditor(null); setDeleting(null); setFailure(''); }}>

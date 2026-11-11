@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { browser } from 'wxt/browser';
-import { Brand } from '../../src/components/Today';
+import { Brand } from '../../src/components/Brand';
 import { SavedGoals } from '../../src/components/SavedGoals';
 import { CloudProgress } from '../../src/components/CloudProgress';
 import '../../src/styles/base.css';

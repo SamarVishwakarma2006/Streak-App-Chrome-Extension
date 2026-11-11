@@ -54,7 +54,7 @@ try {
       { id: ids[1], name: 'Practice data structures', target: 1, unit: 'lessons', archived: false, location: null },
       { id: ids[2], name: 'Read something new', target: 15, unit: 'minutes', archived: false, location: null },
     ] } });
-    const caption = document.createElement('div'); caption.id = 'store-sample-caption'; caption.textContent = 'Sample data · development candidate';
+    const caption = document.createElement('div'); caption.id = 'store-sample-caption'; caption.textContent = 'Sample data · beta candidate';
     caption.style.cssText = 'position:fixed;right:18px;bottom:14px;z-index:9999;padding:6px 12px;border:1px solid #b4c6ad;border-radius:6px;background:#fff;color:#203e35;font:12px system-ui';
     document.body.append(caption);
   }, { ids, ledger });
@@ -65,8 +65,9 @@ try {
     if (section === 'rewards') await page.locator('.reward-card.earned').getByRole('heading', { name: '7 days', exact: true }).waitFor();
     await page.locator('#store-sample-caption').waitFor();
     await page.evaluate(() => { if (document.activeElement instanceof HTMLElement) document.activeElement.blur(); });
-    // Capture the feature at its natural scroll position so the calendar/rewards aren't clipped below the viewport.
-    await page.locator(section === 'today' ? '.saved-goals' : section === 'history' ? '.history-calendar' : '.reward-grid').scrollIntoViewIfNeeded();
+    // Today leads with its real summary; the other captures frame their calendar/rewards.
+    if (section === 'today') await page.evaluate(() => window.scrollTo(0, 0));
+    else await page.locator(section === 'history' ? '.history-calendar' : '.reward-grid').scrollIntoViewIfNeeded();
     const file = path.join(folder, 'screenshots', filename);
     await page.screenshot({ path: file, fullPage: false });
     const png = await readFile(file); assert.equal(png.readUInt32BE(16),1280); assert.equal(png.readUInt32BE(20),800);
@@ -76,7 +77,7 @@ try {
 } finally { await context.close(); }
 await writeFile(path.join(folder, 'RELEASE_INFO.json'), JSON.stringify({ ...info, candidateType:'store-draft', assets,
   submitted:false, approved:false, published:false, publicLaunchApproved:false, blockers:status.blockers,
-  screenshotNote:'Actual extension UI with labeled synthetic records; development badges retained. Recapture from the final release package before submission.',
+  screenshotNote:'Actual extension UI with labeled synthetic records; beta badges retained. Recapture from the final release package before submission.',
 }, null, 2) + '\n');
 console.log(`Store draft prepared: ${folder}`);
 console.log('Three 1280×800 screenshots and 128px icon verified. No submission, approval or publication performed.');

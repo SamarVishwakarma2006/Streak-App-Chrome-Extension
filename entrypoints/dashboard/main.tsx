@@ -1,7 +1,7 @@
 import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Brand, DaySummary, GoalList, PreviewControl, StreakPreview } from '../../src/components/Today';
-import type { PreviewState } from '../../src/components/Today';
+import { browser } from 'wxt/browser';
+import { Brand } from '../../src/components/Brand';
 import { ProgressPage } from '../../src/components/ProgressPage';
 import { SavedGoals } from '../../src/components/SavedGoals';
 import { Account } from '../../src/components/Account';
@@ -25,10 +25,12 @@ function currentSection(): Section {
 
 function Dashboard() {
   const [section, setSection] = useState<Section>(currentSection);
-  const [preview, setPreview] = useState<PreviewState>('sample');
-  const [demo, setDemo] = useState(false);
   useEffect(() => {
-    const update = () => setSection(currentSection());
+    const update = () => {
+      setSection(currentSection());
+      document.getElementById('main-content')?.focus();
+      window.scrollTo(0, 0);
+    };
     window.addEventListener('hashchange', update);
     return () => window.removeEventListener('hashchange', update);
   }, []);
@@ -45,39 +47,17 @@ function Dashboard() {
           {section === item.id && <span className="nav-dot" aria-hidden="true" />}
         </a>)}</nav>
       <div className="sidebar-bottom"><span className="seed" aria-hidden="true">↗</span>
-        <p>Small steps.<br /><strong>Lasting habits.</strong></p><span className="version">Development · v0.1.0</span>
+        <p>Small steps.<br /><strong>Lasting habits.</strong></p><span className="version">Beta · v{browser.runtime.getManifest().version}</span>
       </div>
     </aside>
     <div className="workspace">
-      <header className="topbar"><span>Your learning space</span><span className="demo-badge">DEVELOPMENT</span></header>
+      <header className="topbar"><span>Your learning space</span><span className="demo-badge">BETA</span></header>
       <main id="main-content" className="dashboard" tabIndex={-1}>
         <div className="page-heading">
           <div><p className="eyebrow">BUILD A LITTLE MOMENTUM</p><h1>{sections.find((item) => item.id === section)?.label}</h1>
             <p>{section === 'today' ? 'A good day starts with one small step.' : 'A place for every part of your progress.'}</p></div>
-          {section === 'today' && <button className="button button-outline" onClick={() => setDemo(!demo)}>{demo ? 'Back to saved goals' : 'Explore design demo'}</button>}
         </div>
-        <div className="preview-notice"><span className="notice-dot" aria-hidden="true" /><p>{demo && section === 'today' ? 'You’re exploring sample data. No activity is tracked.' : 'Device goals show local prototype progress. Cloud records are shown separately after you enable sync in Settings.'}</p></div>
-        {section === 'today' ? !demo ? <><CloudProgress /><SavedGoals /></> : <div className="today-layout">
-          <div className="today-main"><PreviewControl value={preview} onChange={setPreview} />
-            {preview === 'sample' && <><DaySummary /><StreakPreview /></>}
-            <div className="section-heading"><h2>Your daily goals</h2><span>{preview === 'sample' ? '3 sample goals' : 'Preview'}</span></div>
-            <GoalList state={preview} />
-            <p className="quiet-note">Your progress will be recorded automatically on supported websites.</p>
-          </div>
-          <aside className="insights" aria-label="Example progress insights">
-            <section className="week-card">
-              <p className="eyebrow">THE BIG PICTURE · EXAMPLE</p><h2>A week of showing up.</h2>
-              <div className="week-dots" role="img" aria-label="Example week: Monday through Thursday completed, Friday in progress, weekend upcoming">
-                {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => <div key={i}><span>{day}</span><b className={i < 4 ? 'day-done' : i === 4 ? 'day-now' : ''}>{i < 4 ? '✓' : i === 4 ? '·' : ''}</b></div>)}
-              </div><p>Every little effort counts.</p>
-            </section>
-            <section className="milestone-card"><span className="milestone-symbol" aria-hidden="true">◇</span>
-              <p className="eyebrow">NEXT MILESTONE · EXAMPLE</p><h2>14 days of JavaScript</h2><p>Two more days to your next milestone.</p>
-              <div className="milestone-bottom"><strong>+100 XP</strong><span>12 / 14 days</span></div>
-            </section>
-            <section className="gentle-note"><h3>A fresh start is still progress.</h3><p>Miss a day? Your streak restarts, but everything you’ve learned stays with you.</p></section>
-          </aside>
-        </div> : section === 'connections' ? <Connection /> : section === 'settings' ? <><Reminders /><Account /><CloudProgress controls /><Privacy /></> : <ProgressPage key={section} rewards={section === 'rewards'} />}
+        {section === 'today' ? <><CloudProgress /><SavedGoals /></> : section === 'connections' ? <Connection /> : section === 'settings' ? <><Reminders /><Account /><CloudProgress controls /><Privacy /></> : <ProgressPage key={section} rewards={section === 'rewards'} />}
         <footer className="dashboard-footer"><span>Built for progress, one day at a time.</span><span>Local resume history · Optional account sync</span></footer>
       </main>
     </div>

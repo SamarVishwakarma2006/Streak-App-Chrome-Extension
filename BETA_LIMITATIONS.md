@@ -1,7 +1,7 @@
 # Beta limitations
 
 - Desktop Chrome unpacked installation only. Store review, store installation and
-  store-to-store updates are not verified. Development badges remain intentional.
+  store-to-store updates are not verified. Beta badges remain intentional.
 - The current default package has no hosted account configuration. Authentication,
   email delivery, hosted multi-device concurrency, backup/restore policy, production
   alerts and actual cloud cleanup schedules remain deployment gates.

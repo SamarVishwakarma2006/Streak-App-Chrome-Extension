@@ -54,7 +54,7 @@ does not claim its approval or affiliation.
 - Publish and verify a completed privacy policy at a stable public URL.
 - Complete hosted checks before advertising account/cloud features as available.
 - Observe actual beta setup/completion; finalize the release UI and recapture its
-  screenshots. Current captures retain development badges and labeled sample data.
+  screenshots. Current captures retain beta badges and labeled sample data.
 - Complete dashboard disclosures against the exact uploaded manifest/package, using
   DISCLOSURES.md. Do not claim an unconfigured candidate is already a cloud service.
 - Keep submission, approval and publication dates/statuses distinct. None has occurred.

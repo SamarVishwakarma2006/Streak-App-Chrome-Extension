@@ -269,7 +269,7 @@ Verify provider-specific APIs and current deployment configuration against their
 
 ## Local goal storage (Step 04)
 
-The dashboard owns goal creation, editing, archiving, restoration, and confirmed deletion. The popup shows active saved goals. Sample progress remains available only through Explore design demo and is never copied into saved goals.
+The dashboard owns goal creation, editing, archiving, restoration, and confirmed deletion. The popup shows active saved goals. Today derives completed/active totals and completed-card states from the existing device ledger. The fictional design demo was retired in the final polish pass. Setup guidance derives from goal and provider state, with no separate onboarding store.
 
 `chrome.storage.local.goalStore` contains `{ version: 1, goals: [...] }`. Each goal has an ID, name, daily target, unit, and archived flag. The background worker serializes mutations and validates input; UI pages subscribe to storage changes. Missing data initializes schema 1 (Step 03 stored nothing). Existing schema 1 is preserved; unknown versions or damaged records block writes instead of resetting data. Future schema changes require explicit migrations in src/goals.ts.
 
@@ -422,6 +422,6 @@ The trusted privacy/export-diagnostics action reads only goal/reading/reminder/c
 
 ## Step 19: store review preparation (2026-10-26)
 
-npm run store:prepare runs the local gate, reuses the beta builder and creates an allowlisted draft review folder. It copies the exact checked ZIP/hash, records source/dirty state and captures Today/History/Rewards at 1280×800 from an isolated extension/profile with synthetic ledger records. A sample caption and actual development badges remain visible. Fixture permission pregrant affects only the capture copy, never the distributable ZIP. No personal profile, live account or third-party article content is captured. The 128px package/store icon uses a code-native SVG optical variant with transparent padding.
+npm run store:prepare runs the local gate, reuses the beta builder and creates an allowlisted draft review folder. It copies the exact checked ZIP/hash, records source/dirty state and captures Today/History/Rewards at 1280×800 from an isolated extension/profile with synthetic ledger records. A sample caption and actual beta badges remain visible. Fixture permission pregrant affects only the capture copy, never the distributable ZIP. No personal profile, live account or third-party article content is captured. The 128px package/store icon uses a code-native SVG optical variant with transparent padding.
 
 The review folder includes listing, privacy/data-permission mapping, reviewer path, release notes and explicit submission/approval/publication status. Draft policy/operator details must be finalized and publicly hosted by the owner before submission. Screenshots must be recaptured from the final release UI/package. The script and CI do not contact a developer account, upload a store item, publish a website or submit anything to review. store/STATUS.json and RELEASE_CHECKLIST.md track the remaining external gates.

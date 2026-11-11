@@ -14,7 +14,7 @@ configuration. Hosted release checks are still pending.
    must directly contain `manifest.json`, `dashboard.html` and `background.js`.
 3. Open `chrome://extensions`, turn on Developer mode, choose **Load unpacked** and
    select that extension folder. Pin the extension from Chrome's toolbar menu.
-4. Click the extension and open its dashboard. The development badge is expected.
+4. Click the extension and open its dashboard. The beta badge is expected.
    No learning website is connected yet; notifications start disabled.
 
 No terminal, Node installation or Supabase account is needed to use the extracted
